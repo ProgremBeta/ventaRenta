@@ -1,0 +1,5 @@
+// Entorno de desarollo
+backend/.env
+
+//Paquetes
+backend/node_modules

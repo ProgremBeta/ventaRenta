@@ -1,0 +1,564 @@
+        //Inicio Alertas//
+
+// Obtener todas las alertas
+get http://localhost:3001/api/alertas
+###
+// Obtener una alerta por ID
+get http://localhost:3001/api/alertas/1
+###
+// Crear una nueva alerta
+post http://localhost:3001/api/alertas
+Content-Type: application/json
+
+{
+  "usuario_id": false,
+  "tipo": "inventario_bajo",
+  "descripcion": "descripcion de la alerta de ejemplo",
+  "leida": false
+}
+###
+// Actualizar una alerta por ID
+put http://localhost:3001/api/alertas/1
+Content-Type: application/json
+
+{
+  "usuario_id": 1,
+  "tipo": "inventario_bajo",
+  "descripcion": "descripcion de la alerta actualizada",
+  "leida": true
+}
+###
+// Eliminar una alerta por ID
+delete http://localhost:3001/api/alertas/1
+###
+
+        //Fin Alertas//
+
+        //Inicio categorias dispositivos//
+
+// Obtener todas las categorías de dispositivos
+get http://localhost:3001/api/categorias_dispositivos
+###
+// Obtener una categoría de dispositivo por ID
+get http://localhost:3001/api/categorias_dispositivos/1
+###
+// Crear una nueva categoría de dispositivo
+post http://localhost:3001/api/categorias_dispositivos
+Content-Type: application/json
+
+{
+  "nombre": "Categoría de ejemplo"
+}
+###
+// Actualizar una categoría de dispositivo por ID
+put http://localhost:3001/api/categorias_dispositivos/1
+Content-Type: application/json
+
+{
+  "nombre": "Categoría actualizada"
+}
+###
+// Eliminar una categoría de dispositivo por ID
+delete http://localhost:3001/api/categorias_dispositivos/1
+###
+
+        //Fin categorias dispositivos//
+
+        //Incio categorias productos//
+
+// Obtener todas las categorías de productos
+get http://localhost:3001/api/categorias_productos
+###
+// Obtener una categoría de producto por ID
+get http://localhost:3001/api/categorias_productos/1
+###
+// Crear una nueva categoría de producto
+post http://localhost:3001/api/categorias_productos
+Content-Type: application/json
+
+{
+  "nombre": "Categoría_producto de ejemplo"
+}
+###
+// Actualizar una categoría de producto por ID
+put http://localhost:3001/api/categorias_productos/1
+Content-Type: application/json
+
+{
+  "nombre": "Categoría_producto actualizada"
+}
+###
+// Eliminar una categoría de producto por ID
+delete http://localhost:3001/api/categorias_productos/1
+###
+
+        //Fin categorias productos//
+
+        //Inicio clientes//
+
+// Obtener todos los clientes
+get http://localhost:3001/api/clientes
+###
+// Obtener un cliente por ID
+get http://localhost:3001/api/clientes/1
+###
+// Crear un nuevo cliente
+post http://localhost:3001/api/clientes
+Content-Type: application/json
+
+{
+  "nombre": "Cliente de ejemplo 2",
+  "email": "cliente.ejemplo@gmail.com",
+  "telefono": "numero de telefono",
+  "puntos": 0
+}
+###
+// Actualizar un cliente por ID
+put http://localhost:3001/api/clientes/2
+Content-Type: application/json
+
+{
+  "nombre": "Cliente 2 actualizado",
+  "email": "cliente.actualizado@gmail.com",
+  "telefono": "numero actualizado",
+  "puntos": 10
+}
+###
+// Eliminar un cliente por ID
+delete http://localhost:3001/api/clientes/2
+###
+
+        //Fin clientes//
+
+        //Inicio detalles venta//
+
+// Obtener todos los detalles de venta
+get http://localhost:3001/api/detalle_ventas
+###
+// Obtener un detalle de venta por ID
+get http://localhost:3001/api/detalle_ventas/1
+###
+// Crear un nuevo detalle de venta
+post http://localhost:3001/api/detalle_ventas
+Content-Type: application/json
+
+{
+  "venta_id": 1,
+  "producto_id": 8,
+  "cantidad": 2,
+  "precio_unitario": 15000,
+  "subtotal": 30000
+}
+###
+// Actualizar un detalle de venta por ID
+put http://localhost:3001/api/detalle_ventas/4
+Content-Type: application/json
+
+{
+  "venta_id": 1,
+  "producto_id": 8,
+  "cantidad": 3,
+  "precio_unitario": 55000,
+  "subtotal": 165000
+}
+###
+// Eliminar un detalle de venta por ID
+delete http://localhost:3001/api/detalle_ventas/4
+###
+
+        //Fin detalles venta//
+
+        //Inicio Deudas//
+
+// Obtener todas las deudas
+get http://localhost:3001/api/deudas
+###
+// Obtener una deuda por ID
+get http://localhost:3001/api/deudas/2
+###
+// Crear una nueva deuda
+post http://localhost:3001/api/deudas
+Content-Type: application/json
+
+{
+  "cliente_id": 3,
+  "origren_tipo": "renta",
+  "origen_id": 1,
+  "monto_total": 50000,
+  "monto_pagado": 50000,
+  "saldo": 0,
+  "estado": "pagada"
+}
+###
+// Actualizar una deuda por ID
+put http://localhost:3001/api/deudas/2
+Content-Type: application/json
+
+{
+  "cliente_id": 3,
+  "origren_tipo": "renta",
+  "origen_id": 2,
+  "monto_total": 45000,
+  "monto_pagado": 40000,
+  "saldo": 0,
+  "estado": "debiendo"
+}
+###
+// Eliminar una deuda por ID
+delete http://localhost:3001/api/deudas/7
+###
+
+        //Fin Deudas//
+
+        //Inicio dispositivos//
+
+// Obtener todos los dispositivos
+get http://localhost:3001/api/dispositivos
+###
+// Obtener un dispositivo por ID
+get http://localhost:3001/api/dispositivos/1
+###
+// Crear un nuevo dispositivo
+post http://localhost:3001/api/dispositivos
+Content-Type: application/json
+
+{
+  "nombre": "Dispositivo de ejemplo",
+  "categoria_id": 2,
+  "precio_hora": 5000,
+  "estado": "activo",
+  "activo": true
+}
+###
+// Actualizar un dispositivo por ID
+put http://localhost:3001/api/dispositivos/2
+Content-Type: application/json
+
+{
+  "nombre": "Dispositivo de ejemplo",
+  "categoria_id": 2,
+  "precio_hora": 6000,
+  "estado": "inactivo",
+  "activo": true
+}
+###
+// Eliminar un dispositivo por ID
+delete http://localhost:3001/api/dispositivos/2
+###
+
+        //Fin dispositivos//
+
+        //Incio invetario productos//
+
+// Obtener todo el inventario de productos
+get http://localhost:3001/api/inventario_productos
+###
+// Obtener un producto del inventario por ID
+get http://localhost:3001/api/inventario_productos/1
+###
+// Crear un nuevo producto en el inventario
+post http://localhost:3001/api/inventario_productos
+Content-Type: application/json
+
+{
+  "producto_id": 8,
+  "stock": 50
+}
+###
+// Actualizar un producto del inventario por ID
+put http://localhost:3001/api/inventario_productos/1
+Content-Type: application/json
+
+{
+  "producto_id": 8,
+  "stock": 100
+}
+###
+// Eliminar un producto del inventario por ID
+delete http://localhost:3001/api/inventario_productos/1
+###
+
+        //Fin inventario productos//
+
+        //Inicio logs//
+
+// Obtener todos los logs
+get http://localhost:3001/api/logs
+###
+// Obtener un log por ID
+get http://localhost:3001/api/logs/1
+###
+// Crear un nuevo log
+post http://localhost:3001/api/logs
+Content-Type: application/json
+
+{
+  "usuario_id": 1,
+  "accion": "delete",
+  "descripcion": "Descripción del log de ejemplo"
+}
+###
+// Actualizar un log por ID
+put http://localhost:3001/api/logs/1
+Content-Type: application/json
+
+{
+  "usuario_id": 1,
+  "accion": "changes prices",
+  "descripcion": "Descripción del log de ejemplo"
+}
+###
+// Eliminar un log por ID
+delete http://localhost:3001/api/logs/1
+###
+
+        //Fin logs//
+
+        //Inicio pago deuda//
+
+// Obtener todos los pagos de deuda
+get http://localhost:3001/api/pagos_deuda
+###
+// Obtener un pago de deuda por ID
+get http://localhost:3001/api/pagos_deuda/1
+###
+// Crear un nuevo pago de deuda
+post http://localhost:3001/api/pagos_deuda
+Content-Type: application/json
+
+{
+  "deuda_id": 8,
+  "monto": 20000,
+  "metodo_pago": "transferencia bancaria"
+}
+###
+// Actualizar un pago de deuda por ID
+put http://localhost:3001/api/pagos_deuda/2
+Content-Type: application/json
+
+{
+  "deuda_id": 8,
+  "monto": 25000,
+  "metodo_pago": "efectivo"
+}
+###
+// Eliminar un pago de deuda por ID
+delete http://localhost:3001/api/pagos_deuda/2
+###
+
+        //Fin pago deuda//
+
+        //Inicio productos//
+
+// Obtener todos los productos
+get http://localhost:3001/api/productos
+###
+// Obtener un producto por ID
+get http://localhost:3001/api/productos/1
+###
+// Crear un nuevo producto
+post http://localhost:3001/api/productos
+Content-Type: application/json
+
+{
+  "nombre": "Producto de ejemplo",
+  "descripcion": "Descripción del producto de ejemplo",
+  "precio": 20000,
+  "categoria_id": 2
+}
+###
+// Actualizar un producto por ID
+put http://localhost:3001/api/productos/8
+Content-Type: application/json
+
+{
+  "nombre": "Producto actualizado",
+  "descripcion": "Descripción del producto actualizado",
+  "precio": 30000,
+  "categoria_id": 2
+}
+###
+// Eliminar un producto por ID
+delete http://localhost:3001/api/productos/8
+###
+
+        //Fin productos//
+
+        //Inicio rentas//
+
+// Obtener todas las rentas
+get http://localhost:3001/api/rentas
+###
+// Obtener una renta por ID
+get http://localhost:3001/api/rentas/1
+###
+// Crear una nueva renta
+post http://localhost:3001/api/rentas
+Content-Type: application/json
+
+{
+  "cliente_id": 3,
+  "usuario_id": 1,
+  "fecha_inicio": "2024-10-01",
+  "fecha_fin": "2024-10-07",
+  "tiempo_total": 6,
+  "metodo_pago": "efectivo",
+  "estado": "activa"
+}
+###
+// Actualizar una renta por ID
+put http://localhost:3001/api/rentas/3
+Content-Type: application/json
+
+{
+  "cliente_id": 3,
+  "usuario_id": 1,
+  "fecha_inicio": "2024-10-01",
+  "fecha_fin": "2024-10-07",
+  "tiempo_total": 6,
+  "metodo_pago": "transferencia bancaria",
+  "estado": "activa"
+}
+###
+// Eliminar una renta por ID
+delete http://localhost:3001/api/rentas/3
+###
+
+        //Fin rentas//
+
+        //Inicio renta dispositivos//
+
+// Obtener todas las rentas de dispositivos
+get http://localhost:3001/api/renta_dispositivos
+###
+// Obtener una renta de dispositivo por ID
+get http://localhost:3001/api/renta_dispositivos/1
+###
+// Crear una nueva renta de dispositivo
+post http://localhost:3001/api/renta_dispositivos
+Content-Type: application/json
+
+{
+  "renta_id": 4,  // hay que corregir en la base de datos
+  "dispositivo_id": 3,
+  "precio_hora": 5000
+}
+###
+// Actualizar una renta de dispositivo por ID
+put http://localhost:3001/api/renta_dispositivos/2
+Content-Type: application/json
+
+{
+  "renta_id": 1,
+  "dispositivo_id": 3,
+  "precio_hora": 5000
+}
+###
+// Eliminar una renta de dispositivo por ID
+delete http://localhost:3001/api/renta_dispositivos/2
+###
+
+        //Fin renta dispositivos//
+
+        //Inicio roles//
+// Obtener todos los roles
+get http://localhost:3001/api/roles
+###
+// Obtener un rol por ID
+get http://localhost:3001/api/roles/1
+###
+// Crear un nuevo rol
+post http://localhost:3001/api/roles
+Content-Type: application/json
+
+{
+  "nombre": "Rol de ejemplo"
+}
+###
+// Actualizar un rol por ID
+put http://localhost:3001/api/roles/3
+Content-Type: application/json
+
+{
+  "nombre": "Rol actualizado"
+}
+###
+// Eliminar un rol por ID
+delete http://localhost:3001/api/roles/3
+###
+
+        //Fin roles//
+
+        //Inicio Usuarios//
+
+// Obtener todos los usuarios
+GET http://localhost:3001/api/usuarios
+
+###
+// Obtener un usuario por ID
+GET http://localhost:3001/api/usuarios/1
+
+###
+
+// Crear un nuevo usuario
+POST http://localhost:3001/api/usuarios
+Content-Type: application/json
+
+{
+  "nombre": "nombre de usuario  ",
+  "email": "nombre.usuario@gmail.com",
+  "telefono": "numero de telefono",
+  "contrasena": "123456",
+  "rol_id": //1 para administrador, 2 para operador
+}
+
+###
+//eliminar un usuario por ID
+DELETE http://localhost:3001/api/usuarios/1
+###
+// Actualizar un usuario por ID
+PUT http://localhost:3001/api/usuarios/1
+Content-Type: application/json
+
+{
+  "nombre": "nombre de usuario actualizado",
+  "email": "corre.actualizado@gmail.com",
+  "telefono": "numero de telefono actualizado",
+  "contrasena": "134679",
+  "rol_id": //1 para administrador, 2 para operador
+}
+###
+
+        //Fin Usuarios//
+
+        //Inicio ventas//
+
+// Obtener todas las ventas
+get http://localhost:3001/api/ventas
+###
+// Obtener una venta por ID
+get http://localhost:3001/api/ventas/1
+###
+// Crear una nueva venta
+post http://localhost:3001/api/ventas
+Content-Type: application/json
+{
+  "cliente_id": 1,
+  "fecha": "2024-10-01",
+  "total": 30000
+}
+###
+// Actualizar una venta por ID
+put http://localhost:3001/api/ventas/1
+Content-Type: application/json
+{
+  "cliente_id": 1,
+  "fecha": "2024-10-01",
+  "total": 35000
+}
+###
+// Eliminar una venta por ID
+delete http://localhost:3001/api/ventas/1
+###
+
+        //Fin ventas//
