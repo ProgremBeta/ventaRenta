@@ -3,12 +3,12 @@ import * as controller from './detalles_ventas.controller.js';
 
 console.log("iniciando rutas de detalles_ventas");
 
-const detallesVentasRouter = express();
+const router = express.Router();
 
-detallesVentasRouter.get('/detalle_ventas', controller.obtenerDetallesVentas);
-detallesVentasRouter.get('/detalle_ventas/:id', controller.obtenerDetalleVentaPorId);
-detallesVentasRouter.post('/detalle_ventas', controller.crearDetalleVenta);
-detallesVentasRouter.put('/detalle_ventas/:id', controller.actualizarDetalleVenta);
-detallesVentasRouter.delete('/detalle_ventas/:id', controller.eliminarDetalleVenta);
+router.get('/', controller.obtenerDetallesVentas);
+router.get('/:id', controller.obtenerDetalleVentaPorId);
+router.post('/', controller.crearDetalleVenta);
+router.put('/:id', controller.actualizarDetalleVenta);
+router.delete('/:id', controller.eliminarDetalleVenta);
 
-export default detallesVentasRouter;
+export default router;

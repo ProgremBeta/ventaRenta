@@ -10,6 +10,17 @@ export const obtenerInventarioProductoPorId = async (id) => {
   return await pool.query('SELECT * FROM inventario_productos WHERE id = $1', [id]);
 };
 
+export const obtenerInventarioPorProductoId = async (producto_id) => {
+  return await pool.query('SELECT * FROM inventario_productos WHERE producto_id = $1', [producto_id]);
+};
+
+export const descontarStock = async (producto_id, cantidad) => {
+  return await pool.query(
+    'UPDATE inventario_productos SET stock = stock - $1 WHERE producto_id = $2 RETURNING *',
+    [cantidad, producto_id]
+  );
+};
+
 export const crearInventarioProducto = async (datos) => {
   return await pool.query('INSERT INTO inventario_productos (producto_id, stock) VALUES ($1, $2) RETURNING *', [datos.producto_id, datos.stock]);
 };

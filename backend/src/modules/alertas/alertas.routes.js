@@ -3,12 +3,12 @@ import * as controller from './alertas.controller.js';
 
 console.log("iniciando rutas de alertas");
 
-const Router = express();
+const router = express.Router();
 
-Router.get('/alertas', controller.obtenerAlertas);
-Router.get('/alertas/:id', controller.obtenerAlertaPorId);
-Router.post('/alertas', controller.crearAlerta);
-Router.put('/alertas/:id', controller.actualizarAlerta);
-Router.delete('/alertas/:id', controller.eliminarAlerta);
+router.get('/', controller.obtenerAlertas);
+router.get('/:id', controller.obtenerAlertaPorId);
+router.post('/', controller.crearAlerta);
+router.put('/:id', controller.actualizarAlerta);
+router.delete('/:id', controller.eliminarAlerta);
 
-export default Router;
+export default router;

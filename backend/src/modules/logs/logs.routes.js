@@ -1,14 +1,12 @@
 import express from 'express';
 import * as controller from './logs.controller.js';
 
-console.log("iniciando rutas de logs");
+const router = express.Router();
 
-const Router = express();
+router.get('/', controller.obtenerLogs);
+router.get('/:id', controller.obtenerLogPorId);
+router.post('/', controller.crearLog);
+router.put('/:id', controller.actualizarLog);
+router.delete('/:id', controller.eliminarLog);
 
-Router.get('/logs', controller.obtenerLogs);
-Router.get('/logs/:id', controller.obtenerLogPorId);
-Router.post('/logs', controller.crearLog);
-Router.put('/logs/:id', controller.actualizarLog);
-Router.delete('/logs/:id', controller.eliminarLog);
-
-export default Router;
+export default router;

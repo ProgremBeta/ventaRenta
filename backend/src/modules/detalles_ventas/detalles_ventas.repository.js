@@ -9,11 +9,11 @@ export const obtenerDetalleVentaPorId = async (id) => {
 };
 
 export const crearDetalleVenta = async (datos) => {
-  return await pool.query('INSERT INTO detalle_ventas (venta_id, producto_id, cantidad, precio_unitario) VALUES ($1, $2, $3, $4) RETURNING *', [datos.venta_id, datos.producto_id, datos.cantidad, datos.precio_unitario]);
+  return await pool.query('INSERT INTO detalle_ventas (venta_id, producto_id, cantidad, precio_unitario, subtotal) VALUES ($1, $2, $3, $4, $5) RETURNING *', [datos.venta_id, datos.producto_id, datos.cantidad, datos.precio_unitario, datos.subtotal]);
 };
 
 export const actualizarDetalleVenta = async (id, datos) => {
-  return await pool.query('UPDATE detalle_ventas SET venta_id=$1, producto_id=$2, cantidad=$3, precio_unitario=$4 WHERE id=$5 RETURNING *', [datos.venta_id, datos.producto_id, datos.cantidad, datos.precio_unitario, id]);
+  return await pool.query('UPDATE detalle_ventas SET venta_id=$1, producto_id=$2, cantidad=$3, precio_unitario=$4, subtotal=$5 WHERE id=$6 RETURNING *', [datos.venta_id, datos.producto_id, datos.cantidad, datos.precio_unitario, datos.subtotal, id]);
 };
 
 export const eliminarDetalleVenta = async (id) => {

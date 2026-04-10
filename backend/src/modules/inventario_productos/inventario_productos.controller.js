@@ -1,4 +1,4 @@
-import * as services from './inventario_productos.services.js';
+import * as services from './inventario_productos.service.js';
 
 console.log("Cargando controladores de inventario...");
 
@@ -8,7 +8,7 @@ export const obtenerInventarioProductos = async (req, res) => {
     res.status(200).json(inventario);
   } catch (error) {
     console.error("Error al obtener el inventario:", error);
-    res.status(500).json({ message: "Error al obtener el inventario" });
+    res.status(400).json({ message: "Error al obtener el inventario" });
   }
 };
 
@@ -42,7 +42,7 @@ export const actualizarInventarioProducto = async (req, res) => {
     res.status(200).json(inventarioActualizado);
   } catch (error) {
     console.error(`Error al actualizar el inventario con ID ${id}:`, error);
-    res.status(404).json({ message: "Inventario no encontrado para actualizar" });
+    res.status(400).json({ message: "Inventario no encontrado para actualizar" });
   }
 };
 
@@ -53,6 +53,6 @@ export const eliminarInventarioProducto = async (req, res) => {
     res.status(200).json({ message: "Inventario eliminado correctamente" });
   } catch (error) {
     console.error(`Error al eliminar el inventario con ID ${id}:`, error);
-    res.status(404).json({ message: "Inventario no encontrado para eliminar" });
+    res.status(400).json({ message: "Inventario no encontrado para eliminar" });
   }
 };

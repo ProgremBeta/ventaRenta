@@ -133,13 +133,13 @@ delete http://localhost:3001/api/clientes/2
         //Inicio detalles venta//
 
 // Obtener todos los detalles de venta
-get http://localhost:3001/api/detalle_ventas
+get http://localhost:3001/api/detalles_venta/
 ###
 // Obtener un detalle de venta por ID
-get http://localhost:3001/api/detalle_ventas/1
+get http://localhost:3001/api/detalles_venta/1
 ###
 // Crear un nuevo detalle de venta
-post http://localhost:3001/api/detalle_ventas
+post http://localhost:3001/api/detalles_venta
 Content-Type: application/json
 
 {
@@ -151,7 +151,7 @@ Content-Type: application/json
 }
 ###
 // Actualizar un detalle de venta por ID
-put http://localhost:3001/api/detalle_ventas/4
+put http://localhost:3001/api/detalles_venta/4
 Content-Type: application/json
 
 {
@@ -163,7 +163,7 @@ Content-Type: application/json
 }
 ###
 // Eliminar un detalle de venta por ID
-delete http://localhost:3001/api/detalle_ventas/4
+delete http://localhost:3001/api/detalles_venta/13
 ###
 
         //Fin detalles venta//
@@ -261,7 +261,7 @@ post http://localhost:3001/api/inventario_productos
 Content-Type: application/json
 
 {
-  "producto_id": 8,
+  "producto_id": 12,
   "stock": 50
 }
 ###
@@ -542,11 +542,20 @@ get http://localhost:3001/api/ventas/1
 // Crear una nueva venta
 post http://localhost:3001/api/ventas
 Content-Type: application/json
+
 {
-  "cliente_id": 1,
-  "fecha": "2024-10-01",
-  "total": 30000
+  "usuario_id": 1,
+  "cliente_id": 3,
+  "metodo_pago": "efectivo",
+  "total": 3000,
+  "detalles": [
+    {
+      "producto_id": 9,
+      "cantidad": 2
+    }
+  ]
 }
+
 ###
 // Actualizar una venta por ID
 put http://localhost:3001/api/ventas/1
@@ -558,7 +567,88 @@ Content-Type: application/json
 }
 ###
 // Eliminar una venta por ID
-delete http://localhost:3001/api/ventas/1
+delete http://localhost:3001/api/ventas/13
 ###
 
         //Fin ventas//
+
+
+        //nueva venta//
+
+post http://localhost:3001/api/nueva_venta/
+Content-Type: application/json
+
+{
+  "usuario_id": 1,
+  "cliente_id": 3,
+  "metodo_pago": "efectivo",
+  "detalles": [
+    {
+      "producto_id": 12,
+      "cantidad": 2
+    }
+  ]
+}
+###
+          //nuevo producto//
+post http://localhost:3001/api/nuevo_producto/
+Content-Type: application/json
+
+{
+  "nombre": "frutas",
+  "descripcion": "reloj para ver la hora",
+  "precio": 60000,
+  "categoria_id": 2
+}
+
+###
+          //nuevo usuario//
+post http://localhost:3001/api/nuevo_usuario/
+Content-Type: application/json
+
+{
+  "nombre": "prueba con contraseña hash",
+  "email": "prueba.contrasena@gmail.com",
+  "telefono": 321564871,
+  "contrasena_hash": "contraseña",
+  "rol_id": 2
+}
+###
+post http://localhost:3001/api/iniciar_renta/
+Content-Type: application/json
+
+{
+  "cliente_id": 3,
+  "usuario_id": 4,
+  "fecha_inicio": "2026-04-09T01:30:00-05:00",
+  "fecha_fin": "2026-04-09T02:30:00-05:00",
+  "metodo_pago": "efectivo",
+  "dispositivos":[
+    {
+      "dispositivo_id": 3
+    }
+  ]
+}
+
+###
+post http://localhost:3001/api/crear_deuda/
+Content-Type: application/json
+
+{
+  "cliente_id": 3,
+  "origen_tipo": "venta",
+  "origen_id": 3,
+  "monto_total": 5000,
+  "saldo": null
+}
+
+###
+post http://localhost:3001/api/pago_deuda/
+Content-Type: application/json
+
+{
+  "deuda_id": 10,
+  "monto": 2500,
+  "metodo_pago": "tranferencia",
+  "monto_total": 5000
+}

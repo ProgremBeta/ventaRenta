@@ -3,3 +3,6 @@ backend/.env
 
 //Paquetes
 backend/node_modules
+
+//desarrollo flutter
+frontend/

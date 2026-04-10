@@ -1,6 +1,6 @@
 import pool from './../../config/db.config.js';
 
-console.log("iniciando alertas en repository");
+/*peticiones para obtener los datos de la base de datos*/
 
 export const obtenerAlertas = async () => {
   return await pool.query('SELECT * FROM alertas');

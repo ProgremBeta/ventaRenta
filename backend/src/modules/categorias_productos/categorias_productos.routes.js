@@ -1,14 +1,12 @@
 import express from 'express';
 import * as controller from './categorias_productos.controller.js';
 
-console.log("iniciando rutas de categorias_productos");
+const routes = express.Router();
 
-const categoriasProductosRouter = express();
+routes.get('/', controller.obtenerCategoriasProductos);
+routes.get('/:id', controller.obtenerCategoriaProductoPorId);
+routes.post('/', controller.crearCategoriaProducto);
+routes.put('/:id', controller.actualizarCategoriaProducto);
+routes.delete('/:id', controller.eliminarCategoriaProducto);
 
-categoriasProductosRouter.get('/categorias_productos', controller.obtenerCategoriasProductos);
-categoriasProductosRouter.get('/categorias_productos/:id', controller.obtenerCategoriaProductoPorId);
-categoriasProductosRouter.post('/categorias_productos', controller.crearCategoriaProducto);
-categoriasProductosRouter.put('/categorias_productos/:id', controller.actualizarCategoriaProducto);
-categoriasProductosRouter.delete('/categorias_productos/:id', controller.eliminarCategoriaProducto);
-
-export default categoriasProductosRouter;
+export default routes;

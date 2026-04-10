@@ -1,14 +1,12 @@
 import express from 'express';
 import * as controller from './clientes.controller.js';
 
-console.log("iniciando rutas de clientes");
+const router = express.Router();
 
-const clientesRouter = express();
+router.get('/', controller.obtenerClientes);
+router.get('/:id', controller.obtenerClientePorId);
+router.post('/', controller.crearCliente);
+router.put('/:id', controller.actualizarCliente);
+router.delete('/:id', controller.eliminarCliente);
 
-clientesRouter.get('/clientes', controller.obtenerClientes);
-clientesRouter.get('/clientes/:id', controller.obtenerClientePorId);
-clientesRouter.post('/clientes', controller.crearCliente);
-clientesRouter.put('/clientes/:id', controller.actualizarCliente);
-clientesRouter.delete('/clientes/:id', controller.eliminarCliente);
-
-export default clientesRouter;
+export default router;

@@ -3,12 +3,12 @@ import * as controller from './ventas.controller.js';
 
 console.log("Cargando rutas de ventas...");
 
-const router = express.Router();
+const ventaRouter = express.Router();
 
-router.get('/ventas', controller.obtenerVentas);
-router.get('/ventas/:id', controller.obtenerVentaPorId);
-router.post('/ventas', controller.crearVenta);
-router.put('/ventas/:id', controller.actualizarVenta);
-router.delete('/ventas/:id', controller.eliminarVenta);
+ventaRouter.get('/', controller.obtenerVentas);
+ventaRouter.get('/:id', controller.obtenerVentaPorId);
+ventaRouter.post('/', controller.crearVenta);
+ventaRouter.put('/:id', controller.actualizarVenta);
+ventaRouter.delete('/:id', controller.eliminarVenta);
 
-export default router;
+export default ventaRouter;

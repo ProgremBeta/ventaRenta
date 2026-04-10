@@ -3,12 +3,12 @@ import * as controller from './renta.controller.js';
 
 console.log("Cargando rutas de renta...");
 
-const Router = express();
+const router = express.Router();
 
-Router.get('/rentas', controller.obtenerRentas);
-Router.get('/rentas/:id', controller.obtenerRentaPorId);
-Router.post('/rentas', controller.crearRenta);
-Router.put('/rentas/:id', controller.actualizarRenta);
-Router.delete('/rentas/:id', controller.eliminarRenta);
+router.get('/', controller.obtenerRentas);
+router.get('/:id', controller.obtenerRentaPorId);
+router.post('/', controller.crearRenta);
+router.put('/:id', controller.actualizarRenta);
+router.delete('/:id', controller.eliminarRenta);
 
-export default Router;
+export default router;

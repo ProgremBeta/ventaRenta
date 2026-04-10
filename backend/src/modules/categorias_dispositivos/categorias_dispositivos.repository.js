@@ -1,5 +1,7 @@
 import Pool from "./../../config/db.config.js";
 
+/*son peticiones para obtener los datos de la base de datos*/
+
 export const obtenerCategoriasDispositivos = async () => {
   return await Pool.query("SELECT * FROM categorias_dispositivo");
 };

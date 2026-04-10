@@ -1,12 +1,14 @@
-import * as services from './categorias_dispositivos.services.js';
+import * as services from './categorias_dispositivos.service.js';
+
+/* encargado de enviar los datos y gestionar el estado de la peticion HTTP */
 
 export const obtenerCategoriasDispositivos = async (req, res) => {
   try {
-    const categorias = await services.obtenerCategoriasDispositivos();
-    res.status(200).json(categorias);
-  } catch {
-    console.error("Error al obtener las categorias de dispositivos: ", error);
-    res.status(500).json({ error: 'Error al obtener las categorias de dispositivos' });
+    const result = await services.obtenerCategoriasDispositivos();
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error al obtener las categorias de dispositivos: ", err);
+    res.status(400).json({ error: 'Error al obtener las categorias de dispositivos' });
   }
 };
 
@@ -19,9 +21,9 @@ export const obtenerCategoriaDispositivoPorId = async (req, res) => {
     } else {
       res.status(200).json(categoria[0]);
     }
-  } catch (error) {
-    console.error("Error al obtener la categoria de dispositivo: ", error);
-    res.status(500).json({ error: 'Error al obtener la categoria de dispositivo' });
+  } catch (err) {
+    console.error("Error al obtener la categoria de dispositivo: ", err);
+    res.status(400).json({ error: 'Error al obtener la categoria de dispositivo' });
   }
 };
 
@@ -30,9 +32,9 @@ export const crearCategoriaDispositivo = async (req, res) => {
   try {
     const nuevaCategoria = await services.crearCategoriaDispositivo(datos);
     res.status(201).json(nuevaCategoria[0]);
-  } catch (error) {
-    console.error("Error al crear la categoria de dispositivo: ", error);
-    res.status(500).json({ error: 'Error al crear la categoria de dispositivo' });
+  } catch (err) {
+    console.error("Error al crear la categoria de dispositivo: ", err);
+    res.status(400).json({ error: 'Error al crear la categoria de dispositivo' });
   }
 };
 
@@ -46,9 +48,9 @@ export const actualizarCategoriaDispositivo = async (req, res) => {
     } else {
       res.status(200).json(categoriaActualizada[0]);
     }
-  } catch (error) {
-    console.error("Error al actualizar la categoria de dispositivo: ", error);
-    res.status(500).json({ error: 'Error al actualizar la categoria de dispositivo' });
+  } catch (err) {
+    console.error("Error al actualizar la categoria de dispositivo: ", err);
+    res.status(400).json({ error: 'Error al actualizar la categoria de dispositivo' });
   }
 };
 
@@ -61,8 +63,8 @@ export const eliminarCategoriaDispositivo = async (req, res) => {
     } else {
       res.status(200).json(categoriaEliminada[0]);
     }
-  } catch (error) {
-    console.error("Error al eliminar la categoria de dispositivo: ", error);
-    res.status(500).json({ error: 'Error al eliminar la categoria de dispositivo' });
+  } catch (err) {
+    console.error("Error al eliminar la categoria de dispositivo: ", err);
+    res.status(400).json({ error: 'Error al eliminar la categoria de dispositivo' });
   }
 };

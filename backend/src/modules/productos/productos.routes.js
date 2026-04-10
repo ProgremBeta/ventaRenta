@@ -3,12 +3,12 @@ import * as controller from './productos.controller.js';
 
 console.log("Cargando rutas de productos...");
 
-const Router = express.Router();
+const router = express.Router();
 
-Router.get('/productos', controller.obtenerProductos);
-Router.get('/productos/:id', controller.obtenerProductoPorId);
-Router.post('/productos', controller.crearProducto);
-Router.put('/productos/:id', controller.actualizarProducto);
-Router.delete('/productos/:id', controller.eliminarProducto);
+router.get('/', controller.obtenerProductos);
+router.get('/:id', controller.obtenerProductoPorId);
+router.post('/', controller.crearProducto);
+router.put('/:id', controller.actualizarProducto);
+router.delete('/:id', controller.eliminarProducto);
 
-export default Router;
+export default router;

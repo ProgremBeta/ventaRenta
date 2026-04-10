@@ -1,7 +1,5 @@
 import pool from '../../config/db.config.js';
 
-console.log("Cargando repositorio de inventario...");
-
 export const obtenerVentas = async () => {
   return await pool.query('SELECT * FROM ventas');
 };

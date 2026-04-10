@@ -1,14 +1,12 @@
 import express from 'express';
 import * as controller from './deudas.controller.js';
 
-console.log("Cargando rutas de deudas...");
+const router = express.Router();
 
-const deudasrouter = express.Router();
+router.get('/', controller.obtenerDeudas);
+router.get('/:id', controller.obtenerDeudaPorId);
+router.post('/', controller.crearDeuda);
+router.put('/:id', controller.actualizarDeuda);
+router.delete('/:id', controller.eliminarDeuda);
 
-deudasrouter.get('/deudas', controller.obtenerDeudas);
-deudasrouter.get('/deudas/:id', controller.obtenerDeudaPorId);
-deudasrouter.post('/deudas', controller.crearDeuda);
-deudasrouter.put('/deudas/:id', controller.actualizarDeuda);
-deudasrouter.delete('/deudas/:id', controller.eliminarDeuda);
-
-export default deudasrouter;
+export default router;
