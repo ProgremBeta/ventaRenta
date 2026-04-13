@@ -2,6 +2,7 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 
 dotenv.config();
+console.log("Variables de entorno cargadas, db.config.js ")
 
 const pool = new pg.Pool({
   user: process.env.DB_USER,
