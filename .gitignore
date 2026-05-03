@@ -1,8 +1,13 @@
+#backend
 // Entorno de desarollo
 backend/.env
 
 //Paquetes
 backend/node_modules
 
+
+
+
+#frontend/
 //desarrollo flutter
-frontend/
+frontend/.env

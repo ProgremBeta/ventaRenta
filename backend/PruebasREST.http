@@ -1,129 +1,102 @@
           //hacer login//
-get http://localhost:3001/api/login/
+post http://localhost:3001/api/login/
 Content-Type: application/json
 
 {
-  "identificacion": 1059696994,
+  "identificacion":1059696994 ,
   "contrasena_hash": "134679"
 }
 ###
+
           //prueba usuarios//
-get http://localhost:3001/api/usuarios
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWNhY2lvbiI6IjE2MTYxNiIsIm5vbWJyZSI6Im9wZXJhZG9yIDE2Iiwicm9sX2lkIjoyLCJpYXQiOjE3NzYwNjY4NDMsImV4cCI6MTc3NjA2ODY0M30.aADknFHU5h-JH_MxCP_qse-hKJrg4zknN30-vFSDHrc
+get http://localhost:3001/api/usuarios/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWNhY2lvbiI6IjEwNTk2OTY5OTQiLCJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NzIzNzg2MiwiZXhwIjoxNzc3MjM5NjYyfQ.QIkPbOv1nuY--eQZCk1jbkRaix6YiLjnhGx6vPhDmeI
 ###
+          //prueba ventas//
 
-get http://localhost:3001/api/usuarios/171717
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWNhY2lvbiI6IjE2MTYxNiIsIm5vbWJyZSI6Im9wZXJhZG9yIDE2Iiwicm9sX2lkIjoyLCJpYXQiOjE3NzYwNjY4NDMsImV4cCI6MTc3NjA2ODY0M30.aADknFHU5h-JH_MxCP_qse-hKJrg4zknN30-vFSDHrc
-
-###
-post http://localhost:3001/api/usuarios/
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWNhY2lvbiI6IjEwNTk2OTY5OTQiLCJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NjA2ODg5OSwiZXhwIjoxNzc2MDcwNjk5fQ.Xrri9Q3BCmCzfGvUF9kd58nqHhsI7PIf3U_2ybw3ovY
-
-{
-  "nombre": "operador 17",
-  "identificacion": "171717",
-  "email": "171717@gmail.com"
-}
-
-###
-put http://localhost:3001/api/usuarios/171717
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWNhY2lvbiI6IjEwNTk2OTY5OTQiLCJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NjA2ODg5OSwiZXhwIjoxNzc2MDcwNjk5fQ.Xrri9Q3BCmCzfGvUF9kd58nqHhsI7PIf3U_2ybw3ovY
-
-{
-  "activo": false
-}
-
-###
-DELETE http://localhost:3001/api/usuarios/161616
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWNhY2lvbiI6IjEwNTk2OTY5OTQiLCJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NjA2Njk5NSwiZXhwIjoxNzc2MDY4Nzk1fQ.xwToR7tTwg0jMS_wln7B-jc4ddcYlL3-PRfwUvUwP6Q
+GET http://localhost:3001/api/ventas
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWNhY2lvbiI6IjEwNTk2OTY5OTQiLCJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NzIzNzg2MiwiZXhwIjoxNzc3MjM5NjYyfQ.QIkPbOv1nuY--eQZCk1jbkRaix6YiLjnhGx6vPhDmeI
 
 ###
 
-          //Pruebas roles//
-
-get http://localhost:3001/api/roles/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJ1c3VhcmlvIDMiLCJyb2xfaWQiOjMsImlhdCI6MTc3NjA1OTQ0MCwiZXhwIjoxNzc2MDYxMjQwfQ.VJ9YfGoAP1DyO4c9RPyWuuHDcJCGET8iRoIAdXY0BQk
-###
-get http://localhost:3001/api/roles/3
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJ1c3VhcmlvIDMiLCJyb2xfaWQiOjMsImlhdCI6MTc3NjA1OTQ0MCwiZXhwIjoxNzc2MDYxMjQwfQ.VJ9YfGoAP1DyO4c9RPyWuuHDcJCGET8iRoIAdXY0BQk
-###
-
-post http://localhost:3001/api/roles/
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NTk3ODY0MSwiZXhwIjoxNzc1OTgwNDQxfQ.GKzfyWyb0EAAyM12CwlShvQN-DJ0kLBCsAWcL8aiPOg
-
-{
-  "nombre": ,
-  "activo": 12
-}
-
-###
           //nuevo usuario//
 
 post http://localhost:3001/api/nuevo_usuario/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWNhY2lvbiI6IjE2MTYxNiIsIm5vbWJyZSI6Im9wZXJhZG9yIDE2Iiwicm9sX2lkIjoyLCJpYXQiOjE3NzYwNjM3NTMsImV4cCI6MTc3NjA2NTU1M30.PqolWhbcY8yR-OgcRumq5qdY-szUBA1xxAYn577nVrU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWNhY2lvbiI6IjEwNTk2OTY5OTQiLCJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NzIzOTkxNywiZXhwIjoxNzc3MjQxNzE3fQ.LMLVtBaPANceKgQfNQf7lF62OtYiwvmSokGOOmkIw04
 
 {
-  "nombre": "operador 18",
-  "identificacion": "181818",
-  "email": "181818@gmail.com",
-  "telefono": 3014778621,
-  "contrasena_hash": "181818",
+  "nombre": "duban",
+  "identificacion": "9911557",
+  "email": "duban@gmail.com",
+  "telefono": 30179854648,
+  "contrasena_hash": "joseduban",
   "rol_id": 1
 }
+
 ###
+
+        //mostrar usuario//
+
+get http://localhost:3001/api/usuarios/280426
+Authorization: Bearer 
+
+
+###
+
 
         //nueva venta//
 
 post http://localhost:3001/api/nueva_venta/
 Content-Type: application/json
-Authorization: Bearer eyJbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NTk2MjU5NCwiZXhwIjoxNzc1OTY0Mzk0fQ.xK8xgAH1X_UtZN2NdGg4GpUqlfXtivxDnOy5kdZhvcI
+Authorization: Bearer 
 
 {
-  "usuario_id": 1,
-  "cliente_id": 3,
-  "metodo_pago": "efectivo",
+  "usuario_id": ,
+  "metodo_pago": ,
   "detalles": [
     {
-      "producto_id": 12,
-      "cantidad": 2
+      "producto_id": ,
+      "cantidad": 
     }
   ]
 }
+
+
 ###
 
           //nuevo producto//
 
+
 post http://localhost:3001/api/nuevo_producto/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NTk2MjU5NCwiZXhwIjoxNzc1OTY0Mzk0fQ.xK8xgAH1X_UtZN2NdGg4GpUqlfXtivxDnOy5kdZhvcI
+Authorization: Bearer
 
 {
-  "nombre": "frutas",
-  "descripcion": "reloj para ver la hora",
-  "precio": 60000,
-  "categoria_id": 2
+  "nombre": "",
+  "descripcion": "",
+  "precio": ,
+  "categoria_id": 
 }
+
+
 ###
 
             //iniciar renta//
 
 post http://localhost:3001/api/iniciar_renta/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NTk2MjU5NCwiZXhwIjoxNzc1OTY0Mzk0fQ.xK8xgAH1X_UtZN2NdGg4GpUqlfXtivxDnOy5kdZhvcI
+Authorization: Bearer 
 
 {
-  "cliente_id": 3,
-  "usuario_id": 4,
+  "cliente_id": ,
+  "usuario_id": ,
   "fecha_inicio": "2026-04-09T01:30:00-05:00",
   "fecha_fin": "2026-04-09T02:30:00-05:00",
   "metodo_pago": "efectivo",
   "dispositivos":[
     {
-      "dispositivo_id": 3
+      "dispositivo_id": 
     }
   ]
 }
@@ -131,16 +104,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJqdWFuI
 
               //crear deuda//
 
+
 post http://localhost:3001/api/crear_deuda/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NTk2MjU5NCwiZXhwIjoxNzc1OTY0Mzk0fQ.xK8xgAH1X_UtZN2NdGg4GpUqlfXtivxDnOy5kdZhvcI
+Authorization: Bearer 
 
 {
-  "cliente_id": 3,
-  "origen_tipo": "venta",
-  "origen_id": 3,
-  "monto_total": 5000,
-  "saldo": null
+  "cliente_id": ,
+  "origen_tipo": "",
+  "origen_id":
 }
 ###
 
@@ -148,12 +120,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJqdWFuI
 
 post http://localhost:3001/api/pago_deuda/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJqdWFuIGlnbmFjaW8gYmV0YW5jdXIiLCJyb2xfaWQiOjEsImlhdCI6MTc3NTk2MjU5NCwiZXhwIjoxNzc1OTY0Mzk0fQ.xK8xgAH1X_UtZN2NdGg4GpUqlfXtivxDnOy5kdZhvcI
+Authorization: Bearer 
 
 {
-  "deuda_id": 10,
-  "monto": 2500,
+  "deuda_id": ,
+  "monto": ,
   "metodo_pago": "tranferencia",
-  "monto_total": 5000
+  "monto_total": 
 }
-###

@@ -72,7 +72,7 @@ export const nuevaVenta = async (data) => {
       producto_id: detalle.producto_id,
       cantidad: detalle.cantidad,
       precio_unitario: precio_unitario,
-      subtotal: subtotal
+      sub_total: subtotal
     });
 
     // Descontar del inventario

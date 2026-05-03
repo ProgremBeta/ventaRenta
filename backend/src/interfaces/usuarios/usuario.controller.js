@@ -2,8 +2,8 @@ import * as service from './../../core/usuarios/usuarios.service.js';
 
 export const obtenerUsuarios = async (req, res, next) => {
   try {
-    const usuarios = await service.obtenerUsuarios();
-    res.status(200).json(usuarios);
+    const result = await service.obtenerUsuarios();
+    res.status(200).json(result);
   } catch (err) {
     next(err);
   }

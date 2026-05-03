@@ -1,373 +1,105 @@
 # Proyecto Venta Renta
 
-> [!NOTE]
-> Este proyecto combina backend en Node.js con Express y PostgreSQL, y frontend en Flutter.
+## Introduccion
 
-## Estructura de carpeta
+Este es un repositorio monolitico(tiene backend y frontend juntos) usando una estructura de carpetas modular y por capas.
 
-> [!WARNING]
-> Como este proyecto esta actualmente en desarrollo, puede que no este actualizada la estructura de carpetas del proyecto
+## Instalar proyecto completo 
 
-#### backend
+hacer un git clone del proyecto:
 
-## Paquetes usados
+    git clone https://github.com/ProgremBeta/ventaRenta
+    cd ventaRenta
 
-> [!TIP]
-> Instala las dependencias ejecutando `npm install` en el directorio backend.
+seguir las siguientes instrucciones:
 
-  * expres
-  * dotenv
-  * pg
+### BACKEND
+
+Estando en la raiz del proyecto navegar hasta el backend:
+
+    ce backend
+
+En necesario que tenga instalado Node JS https://nodejs.org/en y NPM, en windows al instalar desde la pagina oficial viene incluido el npm con el node js, para verificar la instalacion ejecutar el siguiente comando:
+
+``` bash
+  node -v
+  npm -v
+```
+
+En algunas distribuciones de linux se tiene que instalar el npm aparte, tendrian que buscarlo en su gestor de paquete he instalarlo, en mi caso uso arch entonces los comandos serian:
+
+
+    sudo pacman -S nodejs
+    sudo pacman -S npm
+
+y vuelve a verificar la instalacion.
+
+### Paquetes usados en el backend
+
+  * bcrypt
   * cors
+  * dotenv
+  * express
+  * jsonwebtoken
+  * pg
 
-### Esquema para crear la tabla en la base de datos
+### Comando de instalacion
 
-> [!WARNING]
-> Asegúrate de tener PostgreSQL configurado y una base de datos creada antes de ejecutar este esquema. Esta no va ser la estructura final, durante el desarrollo va cambiar deacuerdo a las necesidades del proyecto.
+para instalar estos paquetes simplemente se usa el comando:
 
-> [!NOTE]
-> estructura de la base de datos V1
+    npm install
 
-    CREATE TABLE roles(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(50) NOT NULL UNIQUE
-    );
+### ejecucion del proyectos
 
-    CREATE TABLE usuarios(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(150) NOT NULL,
-      email VARCHAR(150) NOT NULL UNIQUE,
-      telefono VARCHAR(20) NOT NULL,
-      contrasena_hash TEXT NOT NULL,
-      rol_id INT NOT NULL REFERENCES roles(id),
-      activo BOOLEAN DEFAULT TRUE,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
+El proyecto actualmente esta en desarrollo y para ejecutarlo con autorefresco:
 
-    CREATE TABLE clientes(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(150) NOT NULL,
-      email VARCHAR(150),
-      telefono VARCHAR(20),
-      puntos INT DEFAULT 0,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE categorias_producto(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(100) NOT NULL
-    );
+    npm run dev
 
-    CREATE TABLE productos(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(150) NOT NULL,
-      descripcion TEXT,
-      precio DECIMAL(10, 2) NOT NULL,
-      categoria_id INT NOT NULL REFERENCES categorias_producto(id),
-      activo BOOLEAN DEFAULT TRUE
-    );
-    
-    CREATE TABLE inventario_productos(
-      id SERIAL PRIMARY KEY,
-      producto_id INT UNIQUE REFERENCES productos(id) ON DELETE CASCADE,
-      stock INTEGER NOT NULL,
-      fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE ventas(
-      id SERIAL PRIMARY KEY,
-      usuario_id INT REFERENCES usuarios(id),
-      cliente_id INT REFERENCES clientes(id),
-      total DECIMAL(10, 2) NOT NULL,
-      metodo_pago VARCHAR(50) NOT NULL,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE detalle_ventas(
-      id SERIAL PRIMARY KEY,
-      venta_id INT REFERENCES ventas(id) ON DELETE CASCADE,
-      producto_id INT REFERENCES productos(id),
-      cantidad INT NOT NULL,
-      precio_unitario DECIMAL(10, 2),
-      sub_total DECIMAL(10, 2)
-    );
-    
-    CREATE TABLE categorias_dispositivo(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(100)
-    );
-    
-    CREATE TABLE dispositivos(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(150),
-      categoria_id INT NOT NULL REFERENCES categorias_dispositivo(id),
-      precio_hora DECIMAL(10, 2),
-      estado VARCHAR(50),
-      activo BOOLEAN DEFAULT TRUE
-    );
-    
-    CREATE TABLE rentas(
-      id SERIAL PRIMARY KEY,
-      cliente_id INT REFERENCES clientes(id),
-      usuario_id INT REFERENCES usuarios(id),
-      fecha_inicio TIMESTAMP WITH TIME ZONE,
-      fecha_fin TIMESTAMP WITH TIME ZONE,
-      tiempo_total INTERVAL,
-      precio_total DECIMAL(10, 2),
-      metodo_pago VARCHAR(50),
-      estado VARCHAR(50)
-    );
-    
-    CREATE TABLE renta_dispositivos(
-      id SERIAL PRIMARY KEY,
-      renta_id INT REFERENCES rentas(id) ON DELETE CASCADE,
-      dispositivo_id INT REFERENCES dispositivos(id),
-      precio_hora DECIMAL(10, 2)
-    );
-    
-    CREATE TABLE deudas(
-      id SERIAL PRIMARY KEY,
-      cliente_id INT REFERENCES clientes(id),
-      origen_tipo VARCHAR(50),
-      origen_id INT,
-      monto_total DECIMAL(10, 2),
-      monto_pagado DECIMAL(10, 2) DEFAULT 0,
-      saldo DECIMAL(10, 2),
-      estado VARCHAR(50),
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE pagos_deuda(
-      id SERIAL PRIMARY KEY,
-      deuda_id INT REFERENCES deudas(id) ON DELETE CASCADE,
-      monto DECIMAL(10, 2),
-      metodo_pago VARCHAR(50),
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE alertas(
-      id SERIAL PRIMARY KEY,
-      usuario_id INT REFERENCES usuarios(id) ON DELETE CASCADE,
-      tipo VARCHAR(50) NOT NULL,
-      descripcion TEXT NOT NULL,
-      leida BOOLEAN DEFAULT FALSE,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE logs(
-      id SERIAL PRIMARY KEY,
-      usuario_id INT REFERENCES usuarios(id),
-      accion VARCHAR(100),
-      descripcion TEXT,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
+>[!NOTE]
+> para que no tenga ningun inconventiente tiene que estar ubicado en la raiz del proyecto backend
 
-> [!NOTE]
-> estructura de la base de datos V2
+### FRONTEND
 
-    CREATE TABLE roles(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(50) NOT NULL UNIQUE,
-      activo BOOLEAN DEFAULT TRUE,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
+Estando en la raiz del proyecto navegar hasta el frontend:
 
-    CREATE TABLE usuarios(
-      id SERIAL PRIMARY KEY,
-      identificacion VARCHAR(20) UNIQUE NOT NULL, 
-      nombre VARCHAR(150) NOT NULL,
-      email VARCHAR(150) NOT NULL UNIQUE,
-      telefono VARCHAR(30),
-      contrasena_hash TEXT NOT NULL,
-      rol_id INT NOT NULL REFERENCES roles(id),
-      activo BOOLEAN DEFAULT TRUE,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
+    cd frontend
 
-    CREATE TABLE clientes(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(150) NOT NULL,
-      email VARCHAR(150) NOT NULL,
-      telefono VARCHAR(30),
-      puntos INT DEFAULT 0,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE categorias_productos(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(150) NOT NULL,
-      descripcion TEXT,
-      activo BOOLEAN DEFAULT TRUE,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE categorias_dispositivos(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(150),
-      descripcion TEXT,
-      activo BOOLEAN DEFAULT TRUE,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
+el frontend esta siendo desarrollado en flutter entonces para ejecutar el proyectos en necesario lo siguiente:
 
-    CREATE TABLE productos(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(150) NOT NULL,
-      descripcion TEXT,
-      precio DECIMAL(10, 2) NOT NULL,
-      categoria_id INT NOT NULL REFERENCES categorias_productos(id),
-      activo BOOLEAN DEFAULT TRUE,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE inventario_productos(
-      id SERIAL PRIMARY KEY,
-      producto_id INT UNIQUE REFERENCES productos(id) ON DELETE CASCADE,
-      stock INTEGER NOT NULL,
-      stock_minimo INT DEFAULT 0,
-      activo BOOLEAN DEFAULT TRUE,
-      fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE ventas(
-      id SERIAL PRIMARY KEY,
-      usuario_id INT REFERENCES usuarios(id),
-      cliente_id INT REFERENCES clientes(id),
-      total DECIMAL(10, 2) NOT NULL,
-      metodo_pago_id INT REFERENCES metodos_pagos(id),
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE detalles_ventas(
-      id SERIAL PRIMARY KEY,
-      venta_id INT REFERENCES ventas(id) ON DELETE CASCADE,
-      producto_id INT REFERENCES productos(id),
-      cantidad INT NOT NULL,
-      precio_unitario DECIMAL(10, 2) NOT NULL,
-      sub_total DECIMAL(10, 2) NOT NULL,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE dispositivos(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(150),
-      categoria_id INT NOT NULL REFERENCES categorias_dispositivos(id),
-      precio_hora DECIMAL(10, 2),
-      estado VARCHAR(50),
-      activo BOOLEAN DEFAULT TRUE,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE rentas(
-      id SERIAL PRIMARY KEY,
-      usuario_id INT REFERENCES usuarios(id),
-      cliente_id INT REFERENCES clientes(id),
-      fecha_inicio TIMESTAMP WITH TIME ZONE,
-      fecha_fin TIMESTAMP WITH TIME ZONE,
-      tiempo_total INTERVAL,
-      precio_total DECIMAL(10, 2),
-      metodo_pago_id INT REFERENCES metodos_pagos(id),
-      estado VARCHAR(50),
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE detalles_rentas(
-      id SERIAL PRIMARY KEY,
-      renta_id INT REFERENCES rentas(id) ON DELETE CASCADE,
-      dispositivo_id INT REFERENCES dispositivos(id),
-      precio_hora DECIMAL(10, 2) NOT NULL,
-      tiempo_total INTERVAL NOT NULL,
-      sub_total DECIMAL(10, 2) NOT NULL,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE deudas(
-      id SERIAL PRIMARY KEY,
-      cliente_id INT REFERENCES clientes(id),
-      monto_total DECIMAL(10, 2),
-      monto_pagado DECIMAL(10, 2) DEFAULT 0,
-      saldo DECIMAL(10, 2),
-      estado VARCHAR(50),
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
+>[!NOTE]
+> Depende del sistema operativo al instalar el flutter todo viene integrado y otros es necesario instarlar estos paquetes manualmente.
 
-    CREATE TABLE detalles_deudas(
-      id SERIAL PRIMARY KEY,
-      deuda_id INT REFERENCES deudas(id) ON DELETE CASCADE,
-      origen_tipo VARCHAR(50),
-      origen_id INT,
-      descripcion text,
-      monto_pagado DECIMAL(10, 2) DEFAULT 0,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE pagos_deudas(
-      id SERIAL PRIMARY KEY,
-      deuda_id INT REFERENCES deudas(id) ON DELETE CASCADE,
-      monto DECIMAL(10, 2),
-      metodo_pago_id INT REFERENCES metodos_pagos(id),
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE alertas(
-      id SERIAL PRIMARY KEY,
-      usuario_id INT REFERENCES usuarios(id) ON DELETE CASCADE,
-      tipo VARCHAR(50) NOT NULL,
-      descripcion TEXT NOT NULL,
-      leida BOOLEAN DEFAULT FALSE,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE logs(
-      id SERIAL PRIMARY KEY,
-      usuario_id INT REFERENCES usuarios(id),
-      accion VARCHAR(150) NOT NULL,
-      descripcion TEXT,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
+  * instalar flutter https://docs.flutter.dev/install 
+  * instalar cmake https://cmake.org/download/
+  * instalar ninja https://pub.dev/packages/ninja/versions
 
-    CREATE TABLE metodos_pagos(
-      id SERIAL PRIMARY KEY,
-      nombre VARCHAR(50) NOT NULL UNIQUE,
-      descripcion TEXT,
-      fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP      
-    );
+### Ejecutar frontend
 
-  >[!NOTE]
-  > Esto se usa para hacer busquedas con mas eficiencia, buscando directamente donde estan los datos
+ya teniendo todos los paquetes de flutter tambien se puden comprobar que este correcto con el comando:
+
+    flutter doctor
   
+y para ejecutar el proyecto el comando:
 
-    -- LOGIN
-    CREATE INDEX idx_usuarios_email ON usuarios(email);
-    CREATE INDEX idx_usuarios_identificacion ON usuarios(identificacion);
+  flutter run
 
-    -- VENTAS
-    CREATE INDEX idx_ventas_fecha ON ventas(fecha_creacion);
-    CREATE INDEX idx_ventas_usuario ON ventas(usuario_id);
-    CREATE INDEX idx_ventas_cliente ON ventas(cliente_id);
+### base de datos
 
-    -- DETALLES
-    CREATE INDEX idx_detalles_ventas_venta ON detalles_ventas(venta_id);
+La base de datos que use fue POSTGRESQL y esta ubicada en database, desde la raiz del proyecto ingresar el comando:
 
-    -- RENTAS
-    CREATE INDEX idx_rentas_fecha ON rentas(fecha_inicio);
-    CREATE INDEX idx_rentas_usuario ON rentas(usuario_id);
-    CREATE INDEX idx_rentas_cliente ON rentas(cliente_id);
+    cd backend/src/database
 
-    CREATE INDEX idx_detalles_rentas_renta ON detalles_rentas(renta_id);
+ahi estan las diferentes versiones de la base de datos
 
-    -- PRODUCTOS
-    CREATE INDEX idx_productos_categoria ON productos(categoria_id);
-    CREATE INDEX idx_inventario_producto ON inventario_productos(producto_id);
+  * schema_V1.sql
+  * schema_V2.sql
 
-    -- DEUDAS
-    CREATE INDEX idx_deudas_cliente ON deudas(cliente_id);
-    CREATE INDEX idx_pagos_deuda ON pagos_deudas(deuda_id);
 
-    -- DISPOSITIVOS
-    CREATE INDEX idx_dispositivos_categoria ON dispositivos(categoria_id);
 
-    -- LOGS
-    CREATE INDEX idx_logs_usuario ON logs(usuario_id);
+
+
+
+
 
 
 

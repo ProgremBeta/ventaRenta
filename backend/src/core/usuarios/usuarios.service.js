@@ -7,12 +7,12 @@ export const obtenerUsuarios = async () => {
 
 export const obtenerUsuarioPorId = async (id) => {
   const result = await repository.obtenerUsuarioPorId(id);
-  return result.rows[0];
+  return result.rows;
 }
 
 export const crearUsuario = async (datos, rolUsuario) => {
   const result = await repository.crearUsuario(datos);
-  return result.rows[0];
+  return result.rows;
 }
 
 export const actualizarUsuario = async (id, datos) => {
