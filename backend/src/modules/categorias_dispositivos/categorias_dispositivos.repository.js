@@ -1,6 +1,6 @@
-import Pool from "./../../config/db.config.js";
+import Pool from "../../config/db.config.js";
 
-import transaccion from "./../../shared/utils/transacciones.js";
+import transaccion from "../../shared/utils/transacciones.js";
 /*son peticiones para obtener los datos de la base de datos*/
 
 export const obtenerCategoriasDispositivos = async () => {

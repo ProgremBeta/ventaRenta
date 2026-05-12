@@ -1,6 +1,7 @@
 export const gestorErrores = (err, req, res, next) => {
-  console.error(`[${new Date().toISOString()}] ${req.method} ${req.url} → ${err.message}`)
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} → ${err.message}`)
 
+  console.log('el error es:' + err)
   //Error por mal formato de JSON
   if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'El cuerpo de la petición no es un JSON válido' })
 
@@ -20,6 +21,8 @@ export const gestorErrores = (err, req, res, next) => {
 
   // Errores propios con status
   if (err.status) return res.status(err.status).json({ error: err.message })
+  
+  if(err == 'datos cliente')return res.status(400).json({error: 'no existen datos de este cliente'})
 
   // Error genérico
   res.status(500).json({ error: 'Error interno del servidor' })

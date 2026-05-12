@@ -14,15 +14,13 @@ export const crearProducto = async (datos) => {
       nombre,
       descripcion,
       precio,
-      categoria_id,
-      activo
+      categoria_id
     ) VALUES ($1, $2, $3, $4) RETURNING *`,
     [
       datos.nombre,
       datos.descripcion,
       datos.precio,
-      datos.categoria_id,
-      datos.activo
+      datos.categoria_id
     ]);
 };
 
