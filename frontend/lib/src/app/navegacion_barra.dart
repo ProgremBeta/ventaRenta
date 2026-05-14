@@ -15,12 +15,12 @@ class _BarraNavegacionState extends State<BarraNavegacion> {
   // Mapeo de rutas a índices
   final Map<String, int> rutasIndices = {
     '/inicio': 0,
-    '/perfil': 1,
+    '/deudas': 1,
     '/ventas': 2,
   };
 
   // Rutas disponibles para navegar
-  final List<String> rutas = ['/inicio', '/perfil', '/ventas'];
+  final List<String> rutas = ['/inicio', '/deudas', '/ventas'];
 
   int _obtenerIndiceActual() {
     final ruta = GoRouterState.of(context).uri.path;
@@ -34,14 +34,14 @@ class _BarraNavegacionState extends State<BarraNavegacion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorApp.colorFondo,
+      backgroundColor:Color(0xFF1E1E1E),
       body: widget.child,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _obtenerIndiceActual(),
         onTap: _alCambiarItems,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'deudas'),
           BottomNavigationBarItem(icon: Icon(Icons.sell), label: 'Ventas'),
         ],
       ),

@@ -1,27 +1,29 @@
-import 'package:frontend/src/core/network/api_response.dart';
-import 'package:frontend/src/core/network/api_service.dart';
+import 'package:dio/dio.dart';
+import 'package:frontend/src/core/config/dio_conexion.dart';
 
-class ServicioLogin {
-  final ApiService _apiService = ApiService();
+class Autenticacion {
+  final Dio _dio = DioConexion().dio;
 
-  /// Login del usuario
-  Future<ApiResponse<Map<String, dynamic>>> login({
-    required String identificacion,
-    required String contrasena_hash,
-  }) async {
+  Future<Map<String, dynamic>> login(String identificacion, String contrasena) async {
+
     try {
-      final response = await _apiService.post<Map<String, dynamic>>(
-        'http://localhost:3001/api/login',
-        {'identificacion': identificacion, 'contrasena_hash': contrasena_hash},
+      final response = await _dio.post(
+        '/api/login',
+        data: {
+          'identificacion': identificacion,
+          'contrasena_hash': contrasena,
+        },
       );
 
-      return response;
-    } catch (err) {
-      return ApiResponse<Map<String, dynamic>>(
-        success: false,
-        message: 'Hubo un error al iniciar sesión',
-        data: null,
-      );
+      return {
+        'success': true,
+        'data': response.data,
+      };
+    } on DioException catch (e) {
+      return {
+        'success': false,
+        'message': e.response?.data['message'] ?? 'Error de conexión',
+      };
     }
   }
 }

@@ -1,30 +1,39 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:frontend/src/core/storage/almacenamiento_token.dart';
 
 class DioConexion {
   static final DioConexion _instance = DioConexion._internal();
-  late Dio _dio;
 
-  factory DioConexion() {
-    return _instance;
-  }
+  late final Dio _dio;
+
+  factory DioConexion() => _instance;
 
   DioConexion._internal() {
-    final baseUrl = dotenv.env['API_URL'] ?? 'http://localhost:3001/api';
+    final baseUrl = dotenv.env['BASE_URL'];
+
+    debugPrint('DioConexion initialized with BASE_URL: $baseUrl');
+
+    if (BASE_URL == null || BASE_URL.isEmpty) {
+      throw Exception('BASE_URL no está definida en el .env');
+    }
 
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
-        headers: {'Content-Type': 'application/json'},
       ),
     );
 
     _dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
+        onRequest: (options, handler) async {
+          final session = await TokenStorage().leerSession('token');
+          if (session != null && session.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $session';
+          }
           debugPrint('REQUEST: ${options.method} ${options.path}');
           return handler.next(options);
         },

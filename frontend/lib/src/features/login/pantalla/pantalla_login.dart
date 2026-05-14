@@ -1,3 +1,4 @@
+import 'package:frontend/src/core/storage/almacenamiento_token.dart';
 import 'package:frontend/src/core/themes/estilos_app.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/src/core/themes/color_app.dart';
@@ -15,44 +16,46 @@ class _PantallaLoginState extends State<PantallaLogin> {
   final _identificacionIngresada = TextEditingController();
   final _contrasenaIngresada = TextEditingController();
 
-  final ServicioLogin _loginService = ServicioLogin();
+  final loginService = Autenticacion();
 
   bool _isLoading = false;
-  String? _error;
 
   Future<void> _handleLogin() async {
+    
+  setState(() {
+    _isLoading = true;
+  });
+
+  final result = await loginService.login(
+    _identificacionIngresada.text,
+    _contrasenaIngresada.text,
+  );
+
+  debugPrint('resultado de auth: $result');
+
+  setState(() {
+    _isLoading = false;
+  });
+
+
+  if (result['success']) {
+    TokenStorage().guardarSession("token", result['data']['token']);
+    context.go('/inicio');
+  } else {
     setState(() {
-      _isLoading = true;
-      _error = null;
     });
-
-    final response = await _loginService.login(
-      identificacion: _identificacionIngresada.text,
-      contrasena_hash: _contrasenaIngresada.text,
-    );
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (response.success) {
-      context.go('/inicio');
-    } else {
-      setState(() {
-        _error = response.message;
-      });
-    }
   }
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         alignment: Alignment(0, 0),
-        color: ColorApp.colorFondo,
+        color: ColorApp.colorPrincipal,
 
         child: Container(
-          color: ColorApp.colorPrincipal,
+          color: ColorApp.colorSegundario,
           width: EstilosApp.anchoRecuadro,
           height: EstilosApp.alturaRecuadro,
 
@@ -87,12 +90,16 @@ class _PantallaLoginState extends State<PantallaLogin> {
                     ),
 
                     enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: ColorApp.colorHoverInactivo,
+                      ),
                       borderRadius: BorderRadius.circular(
                         EstilosApp.borderRadius - 5,
                       ),
                     ),
 
                     focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: ColorApp.colorHoverActivo),
                       borderRadius: BorderRadius.circular(
                         EstilosApp.borderRadius,
                       ),

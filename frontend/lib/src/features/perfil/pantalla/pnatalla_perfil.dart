@@ -1,24 +1,24 @@
-import 'package:frontend/src/core/themes/color_app.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/src/core/themes/color_app.dart';
 import 'package:frontend/src/core/themes/estilos_app.dart';
 
-class PantallaInicio extends StatefulWidget {
-  const PantallaInicio({super.key});
+class PantallaPerfil extends StatefulWidget {
+  const PantallaPerfil({super.key});
 
   @override
-  State<PantallaInicio> createState() => _PantallaInicioState();
+  State<PantallaPerfil> createState() => _PantallaperfilState();
 }
 
-class _PantallaInicioState extends State<PantallaInicio> {
+class _PantallaperfilState extends State<PantallaPerfil> {
   @override
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment(0, 0),
-      color: ColorApp.colorFondo,
+      color: ColorApp.colorPrincipal,
       child: Container(
         width: 500,
         height: 600,
-        color: ColorApp.colorPrincipal,
+        color: ColorApp.colorSegundario,
         child: Column(
           children: [
             SizedBox(
@@ -29,7 +29,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
                   Padding(
                     padding: EdgeInsets.all(EstilosApp.paddingGrande),
                     child: Text(
-                      "Este es el apartado de inicio",
+                      "Este es el apartado de perfiles",
                       style: TextStyle(
                         color: const Color(0xFF7B0E8C),
                         fontSize: EstilosApp.tamanoTitulo,
