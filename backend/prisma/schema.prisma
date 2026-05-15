@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model alertas {
+  id             Int       @id @default(autoincrement())
+  usuario_id     Int?
+  tipo           String    @db.VarChar(50)
+  descripcion    String
+  visto          Boolean?  @default(false)
+  fecha_creacion DateTime? @default(now()) @db.Timestamptz(6)
+  usuarios       usuarios? @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model categorias_dispositivos {
+  id             Int            @id @default(autoincrement())
+  nombre         String?        @db.VarChar(150)
+  descripcion    String?
+  activo         Boolean?       @default(true)
+  fecha_creacion DateTime?      @default(now()) @db.Timestamptz(6)
+  dispositivos   dispositivos[]
+}
+
+model categorias_productos {
+  id             Int         @id @default(autoincrement())
+  nombre         String      @db.VarChar(150)
+  descripcion    String?
+  activo         Boolean?    @default(true)
+  fecha_creacion DateTime?   @default(now()) @db.Timestamptz(6)
+  productos      productos[]
+}
+
+model clientes {
+  id             Int       @id @default(autoincrement())
+  nombre         String    @db.VarChar(150)
+  email          String    @db.VarChar(150)
+  telefono       String?   @db.VarChar(30)
+  puntos         Int?      @default(0)
+  fecha_creacion DateTime? @default(now()) @db.Timestamptz(6)
+  deudas         deudas[]
+  rentas         rentas[]
+  ventas         ventas[]
+}
+
+model detalles_deudas {
+  id             Int       @id @default(autoincrement())
+  deuda_id       Int?
+  origen_tipo    String?   @db.VarChar(50)
+  origen_id      Int?
+  descripcion    String?
+  monto_pagado   Decimal?  @default(0) @db.Decimal(10, 2)
+  fecha_creacion DateTime? @default(now()) @db.Timestamptz(6)
+  deudas         deudas?   @relation(fields: [deuda_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model detalles_rentas {
+  id             Int                     @id @default(autoincrement())
+  renta_id       Int?
+  dispositivo_id Int?
+  precio_hora    Decimal                 @db.Decimal(10, 2)
+  tiempo_total   Unsupported("interval")
+  sub_total      Decimal                 @db.Decimal(10, 2)
+  fecha_creacion DateTime?               @default(now()) @db.Timestamptz(6)
+  dispositivos   dispositivos?           @relation(fields: [dispositivo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  rentas         rentas?                 @relation(fields: [renta_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([renta_id], map: "idx_detalles_rentas_renta")
+}
+
+model detalles_ventas {
+  id              Int        @id @default(autoincrement())
+  venta_id        Int?
+  producto_id     Int?
+  cantidad        Int
+  precio_unitario Decimal    @db.Decimal(10, 2)
+  sub_total       Decimal    @db.Decimal(10, 2)
+  fecha_creacion  DateTime?  @default(now()) @db.Timestamptz(6)
+  productos       productos? @relation(fields: [producto_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ventas          ventas?    @relation(fields: [venta_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([venta_id], map: "idx_detalles_ventas_venta")
+}
+
+model deudas {
+  id              Int               @id @default(autoincrement())
+  cliente_id      Int?
+  monto_total     Decimal?          @db.Decimal(10, 2)
+  monto_pagado    Decimal?          @default(0) @db.Decimal(10, 2)
+  saldo           Decimal?          @db.Decimal(10, 2)
+  estado          String?           @db.VarChar(50)
+  fecha_creacion  DateTime?         @default(now()) @db.Timestamptz(6)
+  detalles_deudas detalles_deudas[]
+  clientes        clientes?         @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pagos_deudas    pagos_deudas[]
+
+  @@index([cliente_id], map: "idx_deudas_cliente")
+}
+
+model dispositivos {
+  id                      Int                     @id @default(autoincrement())
+  nombre                  String?                 @db.VarChar(150)
+  categoria_id            Int
+  precio_hora             Decimal?                @db.Decimal(10, 2)
+  estado                  String?                 @db.VarChar(50)
+  activo                  Boolean?                @default(true)
+  fecha_creacion          DateTime?               @default(now()) @db.Timestamptz(6)
+  detalles_rentas         detalles_rentas[]
+  categorias_dispositivos categorias_dispositivos @relation(fields: [categoria_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([categoria_id], map: "idx_dispositivos_categoria")
+}
+
+model inventario_productos {
+  id                  Int        @id @default(autoincrement())
+  producto_id         Int?       @unique
+  stock               Int
+  stock_minimo        Int?       @default(0)
+  activo              Boolean?   @default(true)
+  fecha_actualizacion DateTime?  @default(now()) @db.Timestamptz(6)
+  productos           productos? @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([producto_id], map: "idx_inventario_producto")
+}
+
+model logs {
+  id             Int       @id @default(autoincrement())
+  usuario_id     Int?
+  accion         String    @db.VarChar(150)
+  descripcion    String?
+  fecha_creacion DateTime? @default(now()) @db.Timestamptz(6)
+  usuarios       usuarios? @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([usuario_id], map: "idx_logs_usuario")
+}
+
+model metodos_pagos {
+  id             Int            @id @default(autoincrement())
+  nombre         String         @unique @db.VarChar(50)
+  descripcion    String?
+  fecha_creacion DateTime?      @default(now()) @db.Timestamptz(6)
+  pagos_deudas   pagos_deudas[]
+  rentas         rentas[]
+  ventas         ventas[]
+}
+
+model pagos_deudas {
+  id             Int            @id @default(autoincrement())
+  deuda_id       Int?
+  monto          Decimal?       @db.Decimal(10, 2)
+  metodo_pago    Int?
+  fecha_creacion DateTime?      @default(now()) @db.Timestamptz(6)
+  deudas         deudas?        @relation(fields: [deuda_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  metodos_pagos  metodos_pagos? @relation(fields: [metodo_pago], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([deuda_id], map: "idx_pagos_deuda")
+}
+
+model productos {
+  id                   Int                   @id @default(autoincrement())
+  nombre               String                @db.VarChar(150)
+  descripcion          String?
+  precio               Decimal               @db.Decimal(10, 2)
+  categoria_id         Int
+  activo               Boolean?              @default(true)
+  fecha_creacion       DateTime?             @default(now()) @db.Timestamptz(6)
+  detalles_ventas      detalles_ventas[]
+  inventario_productos inventario_productos?
+  categorias_productos categorias_productos  @relation(fields: [categoria_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([categoria_id], map: "idx_productos_categoria")
+}
+
+model rentas {
+  id              Int                      @id @default(autoincrement())
+  usuario_id      Int?
+  cliente_id      Int?
+  fecha_inicio    DateTime?                @db.Timestamptz(6)
+  fecha_fin       DateTime?                @db.Timestamptz(6)
+  tiempo_total    Unsupported("interval")?
+  precio_total    Decimal?                 @db.Decimal(10, 2)
+  metodo_pago     Int?
+  estado          String?                  @db.VarChar(50)
+  fecha_creacion  DateTime?                @default(now()) @db.Timestamptz(6)
+  detalles_rentas detalles_rentas[]
+  clientes        clientes?                @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  metodos_pagos   metodos_pagos?           @relation(fields: [metodo_pago], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios        usuarios?                @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([cliente_id], map: "idx_rentas_cliente")
+  @@index([fecha_inicio], map: "idx_rentas_fecha")
+  @@index([usuario_id], map: "idx_rentas_usuario")
+}
+
+model roles {
+  id             Int        @id @default(autoincrement())
+  nombre         String     @unique @db.VarChar(50)
+  activo         Boolean?   @default(true)
+  fecha_creacion DateTime?  @default(now()) @db.Timestamptz(6)
+  usuarios       usuarios[]
+}
+
+model usuarios {
+  id              Int       @id @default(autoincrement())
+  identificacion  String    @unique @db.VarChar(20)
+  nombre          String    @db.VarChar(150)
+  email           String    @unique @db.VarChar(150)
+  telefono        String?   @db.VarChar(30)
+  contrasena_hash String
+  rol_id          Int
+  activo          Boolean?  @default(true)
+  fecha_creacion  DateTime? @default(now()) @db.Timestamptz(6)
+  alertas         alertas[]
+  logs            logs[]
+  rentas          rentas[]
+  roles           roles     @relation(fields: [rol_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ventas          ventas[]
+
+  @@index([email], map: "idx_usuarios_email")
+  @@index([identificacion], map: "idx_usuarios_identificacion")
+}
+
+model ventas {
+  id              Int               @id @default(autoincrement())
+  usuario_id      Int?
+  cliente_id      Int?
+  total           Decimal           @db.Decimal(10, 2)
+  metodo_pago     Int?
+  fecha_creacion  DateTime?         @default(now()) @db.Timestamptz(6)
+  detalles_ventas detalles_ventas[]
+  clientes        clientes?         @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  metodos_pagos   metodos_pagos?    @relation(fields: [metodo_pago], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios        usuarios?         @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([cliente_id], map: "idx_ventas_cliente")
+  @@index([fecha_creacion], map: "idx_ventas_fecha")
+  @@index([usuario_id], map: "idx_ventas_usuario")
+}

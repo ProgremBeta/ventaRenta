@@ -10,5 +10,5 @@ console.log("Variables de entorno cargadas, server.js ")
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`El servidor está corriendo en http://localhost:${PORT}`);
+  console.log(`El servidor en ejecucion`);
 });
