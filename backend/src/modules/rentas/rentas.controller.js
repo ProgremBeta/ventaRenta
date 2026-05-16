@@ -4,8 +4,10 @@ export const obtenerRentas = async (req, res, next) => {
   try {
     const result = await service.obtenerRentas();
 
+    console.log("resultado de la rentas: ", result);
+
     if (!result || result.length === 0) {
-      return res.status(200).json({ message: 'No se encontraron rentas' });
+      return res.status(201).json({ message: 'No se encontraron rentas' });
     }
     
     res.status(200).json(result);
@@ -20,7 +22,7 @@ export const obtenerRentaPorId = async (req, res, next) => {
     const result = await service.obtenerRentaPorId(id);
 
     if (!result || result.length === 0) {
-      return res.status(200).json({ message: 'Renta no encontrada' });
+      return res.status(201).json({ message: 'Renta no encontrada' });
     }
     
     res.status(200).json(result);

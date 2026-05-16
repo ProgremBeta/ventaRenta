@@ -3,6 +3,9 @@ import * as service from './detalles_ventas.service.js';
 export const obtenerDetallesVentas = async (req, res, next) => {
     try {
         const result = await service.obtenerDetallesVentas();
+
+        console.log("resultado de detalles de venta: ", result);
+
         if (!result || result.length === 0) {
             return res.status(404).json({ message: 'No se encontraron detalles de ventas' });
         }

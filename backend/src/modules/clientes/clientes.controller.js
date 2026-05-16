@@ -43,6 +43,7 @@ export const crearCliente = async (req, res, next) => {
     try {
         const cliente = req.body;
         const result = await service.crearCliente(cliente);
+        console.log("result: ", result);
         res.status(201).json(result);
     } catch (err) {
         next(err);
