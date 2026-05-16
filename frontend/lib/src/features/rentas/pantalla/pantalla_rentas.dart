@@ -1,43 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:frontend/src/core/models/venta.dart';
-import 'package:frontend/src/core/providers/auth_provider.dart';
+import 'package:frontend/src/core/models/renta.dart';
 import 'package:frontend/src/core/themes/color_app.dart';
 import 'package:frontend/src/core/widgets/item_lista.dart';
 import 'package:frontend/src/core/widgets/toast_notificacion.dart';
-import 'package:frontend/src/features/ventas/provider/ventas_provider.dart';
+import 'package:frontend/src/features/rentas/provider/rentas_provider.dart';
 
-class PantallaVentas extends StatefulWidget {
-  const PantallaVentas({super.key});
+class PantallaRentas extends StatefulWidget {
+  const PantallaRentas({super.key});
 
   @override
-  State<PantallaVentas> createState() => _PantallaVentasState();
+  State<PantallaRentas> createState() => _PantallaRentasState();
 }
 
-class _PantallaVentasState extends State<PantallaVentas> {
+class _PantallaRentasState extends State<PantallaRentas> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<VentasProvider>().fetchVentas();
+      context.read<RentasProvider>().fetchRentas();
     });
   }
 
-  void _mostrarDetalle(Venta venta) {
+  void _mostrarDetalle(Renta renta) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ColorApp.colorSegundario,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Venta #${venta.id}', style: const TextStyle(color: ColorApp.colorTitulo)),
+        title: Text('Renta #${renta.id}', style: const TextStyle(color: ColorApp.colorTitulo)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _detalleRow('Cliente ID', venta.clienteId?.toString() ?? '—'),
-            _detalleRow('Total', '\$${venta.total.toStringAsFixed(2)}'),
-            _detalleRow('Método pago', venta.metodoPago?.toString() ?? '—'),
-            _detalleRow('Fecha', venta.fechaCreacion ?? '—'),
+            _detalleRow('Cliente ID', renta.clienteId?.toString() ?? '—'),
+            _detalleRow('Inicio', renta.fechaInicio ?? '—'),
+            _detalleRow('Fin', renta.fechaFin ?? '—'),
+            _detalleRow('Total', renta.precioTotal != null ? '\$${renta.precioTotal!.toStringAsFixed(2)}' : '—'),
+            _detalleRow('Estado', renta.estado ?? '—'),
           ],
         ),
         actions: [
@@ -51,15 +51,13 @@ class _PantallaVentasState extends State<PantallaVentas> {
   }
 
   void _mostrarFormulario() {
-    final provider = context.read<VentasProvider>();
+    final provider = context.read<RentasProvider>();
     provider.fetchClientes();
-    provider.fetchProductos();
-
-    final usuarioId = context.read<AuthProvider>().userRolId;
+    provider.fetchDispositivos();
 
     showDialog(
       context: context,
-      builder: (ctx) => _FormularioNuevaVenta(usuarioId: usuarioId),
+      builder: (ctx) => _FormularioNuevaRenta(),
     );
   }
 
@@ -78,12 +76,12 @@ class _PantallaVentasState extends State<PantallaVentas> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<VentasProvider>();
+    final provider = context.watch<RentasProvider>();
 
     return Scaffold(
       backgroundColor: ColorApp.colorPrincipal,
       appBar: AppBar(
-        title: const Text('Ventas'),
+        title: const Text('Rentas'),
         backgroundColor: ColorApp.colorNavBar,
         titleTextStyle: const TextStyle(color: ColorApp.colorTitulo, fontSize: 20, fontWeight: FontWeight.bold),
         elevation: 0,
@@ -97,7 +95,7 @@ class _PantallaVentasState extends State<PantallaVentas> {
     );
   }
 
-  Widget _buildBody(VentasProvider provider) {
+  Widget _buildBody(RentasProvider provider) {
     if (provider.isLoading) {
       return const Center(child: CircularProgressIndicator(color: ColorApp.colorAcento));
     }
@@ -106,25 +104,28 @@ class _PantallaVentasState extends State<PantallaVentas> {
         child: Text(provider.error!, style: const TextStyle(color: ColorApp.colorError)),
       );
     }
-    if (provider.ventas.isEmpty) {
+    if (provider.rentas.isEmpty) {
       return const Center(
-        child: Text('No hay ventas registradas', style: TextStyle(color: ColorApp.colorTextoMuted)),
+        child: Text('No hay rentas registradas', style: TextStyle(color: ColorApp.colorTextoMuted)),
       );
     }
     return RefreshIndicator(
       color: ColorApp.colorAcento,
-      onRefresh: provider.fetchVentas,
+      onRefresh: provider.fetchRentas,
       child: ListView.builder(
         padding: const EdgeInsets.only(top: 8, bottom: 80),
-        itemCount: provider.ventas.length,
+        itemCount: provider.rentas.length,
         itemBuilder: (context, index) {
-          final venta = provider.ventas[index];
+          final renta = provider.rentas[index];
+          final estado = renta.estado ?? 'desconocido';
+          final colorEstado = estado == 'activa' ? ColorApp.colorExito : ColorApp.colorTextoMuted;
           return ItemLista(
-            titulo: 'Venta #${venta.id}',
-            subtitulo: venta.clienteId != null ? 'Cliente: #${venta.clienteId}' : 'Sin cliente',
-            detalle: '\$${venta.total.toStringAsFixed(0)}',
-            icono: Icons.receipt_long,
-            onTap: () => _mostrarDetalle(venta),
+            titulo: 'Renta #${renta.id}',
+            subtitulo: renta.clienteId != null ? 'Cliente: #${renta.clienteId}' : 'Sin cliente',
+            detalle: renta.precioTotal != null ? '\$${renta.precioTotal!.toStringAsFixed(0)}' : null,
+            icono: Icons.videogame_asset,
+            colorIcono: colorEstado,
+            onTap: () => _mostrarDetalle(renta),
           );
         },
       ),
@@ -132,29 +133,64 @@ class _PantallaVentasState extends State<PantallaVentas> {
   }
 }
 
-class _FormularioNuevaVenta extends StatefulWidget {
-  final int? usuarioId;
-  const _FormularioNuevaVenta({this.usuarioId});
-
+class _FormularioNuevaRenta extends StatefulWidget {
   @override
-  State<_FormularioNuevaVenta> createState() => _FormularioNuevaVentaState();
+  State<_FormularioNuevaRenta> createState() => _FormularioNuevaRentaState();
 }
 
-class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
+class _FormularioNuevaRentaState extends State<_FormularioNuevaRenta> {
   final _formKey = GlobalKey<FormState>();
   int? _clienteId;
-  int? _productoId;
-  int _cantidad = 1;
+  int? _dispositivoId;
+  DateTime _fechaInicio = DateTime.now();
+  DateTime _fechaFin = DateTime.now().add(const Duration(hours: 1));
   bool _enviando = false;
+
+  Future<void> _seleccionarFecha(bool esInicio) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: esInicio ? _fechaInicio : _fechaFin,
+      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) => Theme(
+        data: ThemeData.dark().copyWith(
+          colorScheme: const ColorScheme.dark(primary: ColorApp.colorAcento),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) {
+      final time = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(esInicio ? _fechaInicio : _fechaFin),
+        builder: (context, child) => Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(primary: ColorApp.colorAcento),
+          ),
+          child: child!,
+        ),
+      );
+      if (time != null) {
+        final combined = DateTime(picked.year, picked.month, picked.day, time.hour, time.minute);
+        setState(() {
+          if (esInicio) {
+            _fechaInicio = combined;
+          } else {
+            _fechaFin = combined;
+          }
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<VentasProvider>();
+    final provider = context.watch<RentasProvider>();
 
     return AlertDialog(
       backgroundColor: ColorApp.colorSegundario,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: const Text('Nueva Venta', style: TextStyle(color: ColorApp.colorTitulo)),
+      title: const Text('Nueva Renta', style: TextStyle(color: ColorApp.colorTitulo)),
       content: Form(
         key: _formKey,
         child: Column(
@@ -172,22 +208,36 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<int>(
-              value: _productoId,
-              items: provider.productos.map((p) {
-                return DropdownMenuItem(value: p.id, child: Text(p.nombre, style: const TextStyle(color: ColorApp.colorTexto)));
+              value: _dispositivoId,
+              items: provider.dispositivos.map((d) {
+                return DropdownMenuItem(value: d.id, child: Text(d.nombre ?? 'Disp #${d.id}', style: const TextStyle(color: ColorApp.colorTexto)));
               }).toList(),
-              onChanged: (v) => _productoId = v,
-              decoration: _inputDeco('Producto'),
+              onChanged: (v) => _dispositivoId = v,
+              decoration: _inputDeco('Dispositivo'),
               dropdownColor: ColorApp.colorElevado,
               style: const TextStyle(color: ColorApp.colorTexto),
             ),
             const SizedBox(height: 12),
-            TextFormField(
-              initialValue: '1',
-              keyboardType: TextInputType.number,
-              decoration: _inputDeco('Cantidad'),
-              style: const TextStyle(color: ColorApp.colorTexto),
-              onChanged: (v) => _cantidad = int.tryParse(v) ?? 1,
+            InkWell(
+              onTap: () => _seleccionarFecha(true),
+              child: InputDecorator(
+                decoration: _inputDeco('Fecha inicio'),
+                child: Text(
+                  '${_fechaInicio.day}/${_fechaInicio.month}/${_fechaInicio.year} ${_fechaInicio.hour}:${_fechaInicio.minute.toString().padLeft(2, '0')}',
+                  style: const TextStyle(color: ColorApp.colorTexto),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            InkWell(
+              onTap: () => _seleccionarFecha(false),
+              child: InputDecorator(
+                decoration: _inputDeco('Fecha fin'),
+                child: Text(
+                  '${_fechaFin.day}/${_fechaFin.month}/${_fechaFin.year} ${_fechaFin.hour}:${_fechaFin.minute.toString().padLeft(2, '0')}',
+                  style: const TextStyle(color: ColorApp.colorTexto),
+                ),
+              ),
             ),
           ],
         ),
@@ -202,22 +252,26 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
             if (!_formKey.currentState!.validate()) return;
             setState(() => _enviando = true);
 
-            final exito = await context.read<VentasProvider>().crearVenta({
-              'usuario_id': widget.usuarioId ?? 1,
-              'metodo_pago': 1,
+            final data = {
               'cliente_id': _clienteId,
-              'detalles': [
-                {'producto_id': _productoId, 'cantidad': _cantidad},
+              'usuario_id': 1,
+              'fecha_inicio': _fechaInicio.toIso8601String(),
+              'fecha_fin': _fechaFin.toIso8601String(),
+              'metodo_pago': 1,
+              'dispositivos': [
+                {'dispositivo_id': _dispositivoId, 'precio_hora': 5000},
               ],
-            });
+            };
+
+            final exito = await context.read<RentasProvider>().iniciarRenta(data);
 
             if (!mounted) return;
             Navigator.pop(context);
 
             if (exito) {
-              ToastNotificacion.mostrar(context, mensaje: 'Venta creada con éxito', tipo: TipoToast.exito);
+              ToastNotificacion.mostrar(context, mensaje: 'Renta iniciada con éxito', tipo: TipoToast.exito);
             } else {
-              ToastNotificacion.mostrar(context, mensaje: 'Error al crear venta', tipo: TipoToast.error);
+              ToastNotificacion.mostrar(context, mensaje: 'Error al iniciar renta', tipo: TipoToast.error);
             }
           },
           style: ElevatedButton.styleFrom(
@@ -228,7 +282,7 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
           ),
           child: _enviando
               ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Text('Crear Venta'),
+              : const Text('Iniciar Renta'),
         ),
       ],
     );
