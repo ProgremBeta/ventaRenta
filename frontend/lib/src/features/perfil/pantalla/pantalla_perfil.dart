@@ -37,6 +37,14 @@ class PantallaPerfil extends StatelessWidget {
                   color: ColorApp.colorTitulo,
                   fontSize: EstilosApp.tamanoSubtitulo,
                   fontWeight: FontWeight.bold,
+                ),  
+              ),
+              Text(
+                auth.userRolId.toString(),
+                style: const TextStyle(
+                  color: ColorApp.colorTitulo,
+                  fontSize: EstilosApp.tamanoSubtitulo,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 32),

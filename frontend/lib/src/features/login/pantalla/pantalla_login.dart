@@ -63,11 +63,6 @@ class _PantallaLoginState extends State<PantallaLogin> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.store_rounded,
-                    color: ColorApp.colorAcento,
-                    size: 56,
-                  ),
                   const SizedBox(height: 8),
                   Text(
                     'Iniciar Sesión',

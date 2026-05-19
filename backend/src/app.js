@@ -24,6 +24,7 @@ import deudasRoutes from './modules/deudas/deudas.routes.js';
 import inventarioProductosRoutes from './modules/inventario_productos/inventario_productos.routes.js';
 import clientesRoutes from './modules/clientes/clientes.routes.js';
 import pagoDeudasRoutes from './modules/pagos_deudas/pagos_deudas.routes.js';
+import metodosPagos from './modules/metodos_pagos/metodos_pagos.routes.js'
 
 //rutas de login
 import loginRoutes from './modules/login/login.routes.js';
@@ -65,6 +66,7 @@ app.use('/api/deudas', verificarToken, deudasRoutes);
 app.use('/api/inventario_productos', verificarToken, inventarioProductosRoutes);
 app.use('/api/clientes', verificarToken, clientesRoutes);
 app.use('/api/pagos_deudas', verificarToken, pagoDeudasRoutes);
+app.use('/api/metodos_pagos', verificarToken, metodosPagos);
 
 //rutas de login
 app.use('/api/login', loginRoutes);

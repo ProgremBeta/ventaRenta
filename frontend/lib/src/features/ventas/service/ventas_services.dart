@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:frontend/src/core/config/dio_conexion.dart';
 import 'package:frontend/src/core/models/cliente.dart';
+import 'package:frontend/src/core/models/metodos_pagos.dart';
 import 'package:frontend/src/core/models/producto.dart';
 import 'package:frontend/src/core/models/venta.dart';
 
@@ -47,6 +48,17 @@ class VentaServices {
       return data.map((json) => Producto.fromJson(json)).toList();
     } on DioException catch (e) {
       debugPrint("ERROR productos: ${e.response?.data}");
+      return [];
+    }
+  }
+
+  Future<List<MetodosPagos>> metodoPago() async{
+    try {
+      final response = await _dio.get('/api/metodos_pagos');
+      final List<dynamic> data = response.data;
+      return data.map((json) => MetodosPagos.fromJson(json)).toList(); 
+    } on DioException catch (e) {
+      debugPrint("Error metodos de pagos: ${e.response?.data}");
       return [];
     }
   }

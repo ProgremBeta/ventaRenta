@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/src/core/providers/auth_provider.dart';
 import 'package:frontend/src/core/themes/color_app.dart';
@@ -40,14 +41,15 @@ class _PantallaInicioState extends State<PantallaInicio> {
     return Scaffold(
       backgroundColor: ColorApp.colorPrincipal,
       appBar: AppBar(
-        title: Text('Hola, ${auth.userName ?? 'Usuario'}'),
+        title: Text("INICIO"),
         backgroundColor: ColorApp.colorNavBar,
         titleTextStyle: const TextStyle(color: ColorApp.colorTitulo, fontSize: 20, fontWeight: FontWeight.bold),
         elevation: 0,
         actions: [
+          Text(' ${auth.userName ?? 'Usuario'}'),
           IconButton(
             icon: const Icon(Icons.person_outline, color: ColorApp.colorAcento),
-            onPressed: () => Navigator.pushNamed(context, '/perfil'),
+            onPressed: () => context.pushNamed('/perfil')
           ),
         ],
       ),
@@ -59,21 +61,21 @@ class _PantallaInicioState extends State<PantallaInicio> {
             child: Column(
               children: [
                 _tarjetaResumen(
-                  icono: Icons.sell,
+                  //icono: Icons.sell,
                   titulo: 'Ventas totales',
                   valor: '\$${totalVentas.toStringAsFixed(0)}',
                   color: ColorApp.colorAcento,
                 ),
                 const SizedBox(height: 12),
                 _tarjetaResumen(
-                  icono: Icons.videogame_asset,
+                  //icono: Icons.videogame_asset,
                   titulo: 'Rentas activas',
                   valor: '$rentasActivas',
                   color: ColorApp.colorExito,
                 ),
                 const SizedBox(height: 12),
                 _tarjetaResumen(
-                  icono: Icons.account_balance,
+                  //icono: Icons.account_balance,
                   titulo: 'Deudas pendientes',
                   valor: '$deudasPendientes (\$${totalDeudas.toStringAsFixed(0)})',
                   color: ColorApp.colorAdvertencia,
@@ -87,7 +89,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
   }
 
   Widget _tarjetaResumen({
-    required IconData icono,
+    //required IconData icono,
     required String titulo,
     required String valor,
     required Color color,
@@ -108,7 +110,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
               color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icono, color: color, size: 28),
+            //child: Icon(icono, color: color, size: 28),
           ),
           const SizedBox(width: 16),
           Expanded(

@@ -22,7 +22,7 @@ class Producto {
       id: json['id'] as int,
       nombre: json['nombre'] as String,
       descripcion: json['descripcion'] as String?,
-      precio: (json['precio'] as num).toDouble(),
+      precio: double.parse(json['precio']).toDouble(),
       categoriaId: json['categoria_id'] as int?,
       activo: json['activo'] as bool?,
       fechaCreacion: json['fecha_creacion'] as String?,
@@ -31,7 +31,7 @@ class Producto {
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'nombre': nombre,
+        'nombre': nombre, 
         'descripcion': descripcion,
         'precio': precio,
         'categoria_id': categoriaId,

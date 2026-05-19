@@ -22,7 +22,7 @@ class AuthProvider extends ChangeNotifier {
   Future<void> verificarSesion() async {
     final token = await _storage.leerToken();
     _isAuthenticated = token != null && token.isNotEmpty;
-    notifyListeners();
+    notifyListeners();  
   }
 
   Future<bool> login(String identificacion, String contrasena) async {

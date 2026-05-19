@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/utils/convertidor_fecha.dart';
+import 'package:frontend/src/utils/convertidor_moneda.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/src/core/models/venta.dart';
 import 'package:frontend/src/core/providers/auth_provider.dart';
@@ -24,20 +26,24 @@ class _PantallaVentasState extends State<PantallaVentas> {
   }
 
   void _mostrarDetalle(Venta venta) {
+    String fechaDB = venta.fechaCreacion.toString();
+    double valorDB = venta.total;
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ColorApp.colorSegundario,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Venta #${venta.id}', style: const TextStyle(color: ColorApp.colorTitulo)),
+        title: Text('venta: ${venta.id}', style: const TextStyle(color: ColorApp.colorTitulo)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _detalleRow('Cliente ID', venta.clienteId?.toString() ?? '—'),
-            _detalleRow('Total', '\$${venta.total.toStringAsFixed(2)}'),
-            _detalleRow('Método pago', venta.metodoPago?.toString() ?? '—'),
-            _detalleRow('Fecha', venta.fechaCreacion ?? '—'),
+            _detalleRow('Usuario ', venta.usuarioId.toString()),
+            _detalleRow('Cliente ID', venta.clienteId?.toString() ?? 'no registrado'),
+            _detalleRow('Total', FormatoMoneda(valorDB)),
+            _detalleRow('Método pago', venta.metodoPago.toString()),
+            _detalleRow('Fecha', FormatoFecha(fechaDB)),
           ],
         ),
         actions: [
@@ -54,6 +60,7 @@ class _PantallaVentasState extends State<PantallaVentas> {
     final provider = context.read<VentasProvider>();
     provider.fetchClientes();
     provider.fetchProductos();
+    provider.fetchMetodoPago();
 
     final usuarioId = context.read<AuthProvider>().userRolId;
 
@@ -111,6 +118,7 @@ class _PantallaVentasState extends State<PantallaVentas> {
         child: Text('No hay ventas registradas', style: TextStyle(color: ColorApp.colorTextoMuted)),
       );
     }
+    
     return RefreshIndicator(
       color: ColorApp.colorAcento,
       onRefresh: provider.fetchVentas,
@@ -119,10 +127,11 @@ class _PantallaVentasState extends State<PantallaVentas> {
         itemCount: provider.ventas.length,
         itemBuilder: (context, index) {
           final venta = provider.ventas[index];
+          double valorDB = venta.total;
           return ItemLista(
-            titulo: 'Venta #${venta.id}',
-            subtitulo: venta.clienteId != null ? 'Cliente: #${venta.clienteId}' : 'Sin cliente',
-            detalle: '\$${venta.total.toStringAsFixed(0)}',
+            titulo: 'id de venta: ${venta.id}',
+            subtitulo: venta.clienteId != null ? 'Cliente: #${venta.clienteId}' : 'cliente no registrado',
+            detalle: FormatoMoneda(valorDB),
             icono: Icons.receipt_long,
             onTap: () => _mostrarDetalle(venta),
           );
@@ -144,6 +153,7 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
   final _formKey = GlobalKey<FormState>();
   int? _clienteId;
   int? _productoId;
+  int? _metodoPago;
   int _cantidad = 1;
   bool _enviando = false;
 
@@ -160,6 +170,7 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+
             DropdownButtonFormField<int>(
               value: _clienteId,
               items: provider.clientes.map((c) {
@@ -170,6 +181,19 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
               dropdownColor: ColorApp.colorElevado,
               style: const TextStyle(color: ColorApp.colorTexto),
             ),
+
+            const SizedBox(height: 12),
+            DropdownButtonFormField<int>(
+              value: _metodoPago,
+              items: provider.metodoPago.map((p) {
+                return DropdownMenuItem(value: p.id, child: Text(p.nombre, style: const TextStyle(color: ColorApp.colorTexto)));
+              }).toList(),
+              onChanged: (v) => _metodoPago = v,
+              decoration: _inputDeco('metodo de pago'),
+              dropdownColor: ColorApp.colorElevado,
+              style: const TextStyle(color: ColorApp.colorTexto),
+            ),
+ 
             const SizedBox(height: 12),
             DropdownButtonFormField<int>(
               value: _productoId,
@@ -181,6 +205,7 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
               dropdownColor: ColorApp.colorElevado,
               style: const TextStyle(color: ColorApp.colorTexto),
             ),
+
             const SizedBox(height: 12),
             TextFormField(
               initialValue: '1',

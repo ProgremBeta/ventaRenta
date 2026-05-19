@@ -25,8 +25,9 @@ class Autenticacion {
       );
       final loginResponse = LoginResponse.fromJson(response.data);
       return LoginResult(exito: true, data: loginResponse);
+
     } on DioException catch (e) {
-      final msg = e.response?.data?['mensaje'] as String? ?? 'Error de conexión';
+      final msg = e.response?.data?['mensaje'] as String? ?? 'Error al realizar la conexión';
       debugPrint('Error login: $msg');
       return LoginResult(exito: false, mensaje: msg);
     }
