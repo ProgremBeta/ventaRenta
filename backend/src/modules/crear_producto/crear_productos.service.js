@@ -4,6 +4,9 @@ import * as inventarioRepository from './../../modules/inventario_productos/inve
 
 export const crearProductos = async (data) => {
   // Validar que la categoría existe
+
+  console.log(`la categoria id es :${data}`)
+
   if (!data.categoria_id) {
     throw new Error("no se ingresó categoria_id");
   }
@@ -25,7 +28,7 @@ export const crearProductos = async (data) => {
 
   const producto = await productoRepository.crearProducto(datosProductos);
 
-  console.log("productos: ",producto);
+  console.log("productos: ",producto.rows[0].id);
 
   // Crear inventario para el producto recién creado
   const producto_id = producto.rows[0].id;
