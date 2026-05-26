@@ -12,14 +12,14 @@ export const obtenerInventarioPorProductoId = async (producto_id) => {
   return await pool.query('SELECT * FROM inventario_productos WHERE producto_id = $1', [producto_id]);
 };
 
-export const descontarStock = async (producto_id, cantidad) => {
+export const descontarStock = async (id, cantidad) => {
   return await pool.query(`
     UPDATE inventario_productos SET 
-      stock = stock - $1 
+      stock = $1 
     WHERE producto_id = $2 RETURNING *`,
     [
       cantidad,
-      producto_id
+      id
     ]);
 };
 

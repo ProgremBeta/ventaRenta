@@ -1,26 +1,26 @@
 import * as repository from './../../modules/rentas/rentas.repository.js';
 
 export const obtenerRentas = async () => {
-  const rentas = await repository.obtenerRentas();
-  return rentas[0];
+  const result = await repository.obtenerRentas();
+  return result.rows;
 }
 
 export const obtenerRentaPorId = async (id) => {
-  const renta = await repository.obtenerRentaPorId(id);
-  return renta[0];
+  const result = await repository.obtenerRentaPorId(id);
+  return result.rows;
 }
 
 export const crearRenta = async (datos) => {
-  const nuevaRenta = await repository.crearRenta(datos);
-  return nuevaRenta[0];
+  const result = await repository.crearRenta(datos);
+  return result.rows;
 }
 
 export const actualizarRenta = async (id, datos) => {
-  const rentaActualizada = await repository.actualizarRenta(id, datos);
-  return rentaActualizada[0];
+  const result = await repository.actualizarRenta(id, datos);
+  return result.rows;
 }
 
 export const eliminarRenta = async (id) => {
-  const rentaEliminada = await repository.eliminarRenta(id);
-  return rentaEliminada[0];
+  const result = await repository.eliminarRenta(id);
+  return result.rows;
 }

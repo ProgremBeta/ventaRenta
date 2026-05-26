@@ -6,6 +6,11 @@ console.log("en la ruta de metodos de pagos");
 
 const routes = express.Router();
 
-routes.use('/', controller.obtenerMetodosPagos);
+routes.get('/', controller.obtenerMetodosPagos);
+routes.get('/:id', controller.obtenerMetodoPagoPorId);
+routes.post('/', controller.crearMetodoPago);
+routes.put('/:id', controller.actualizarMetodoPago);
+routes.delete('/:id', controller.eliminarMetodoPago);
+
 
 export default routes;

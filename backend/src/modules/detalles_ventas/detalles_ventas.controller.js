@@ -4,8 +4,6 @@ export const obtenerDetallesVentas = async (req, res, next) => {
     try {
         const result = await service.obtenerDetallesVentas();
 
-        console.log("resultado de detalles de venta: ", result);
-
         if (!result || result.length === 0) {
             return res.status(404).json({ message: 'No se encontraron detalles de ventas' });
         }
@@ -16,24 +14,47 @@ export const obtenerDetallesVentas = async (req, res, next) => {
 };
 
 export const obtenerDetalleVentaPorId = async (req, res, next) => {
-    try {
-        const { id } = req.params;
+    const { id } = req.params;
 
+    try {
         const result = await service.obtenerDetalleVentaPorId(id);
+
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'Detalle de venta no encontrado' });
-        
+            console.log(`Detalle de venta del id: ${id} no existe`)
+            return res.status(404).json({ message: `Detalle de venta del id: ${id} no existe` });
         }
-        res.json(result);
+
+        res.status(200).json(result);
     } catch (err) {
         next(err);
     }
 };
 
 export const crearDetalleVenta = async (req, res, next) => {
+    const datos = req.body;
+
     try {
-        const data = req.body;
-        const result = await service.crearDetalleVenta(data);
+        if (!datos) {
+            console.log("no ingresastes datos para crear usuario")
+            return res.status(400).json({mensaje: "no ingresastes datos para crear usuario"})
+        }
+
+        if (!datos.cantidad) {
+            console.log("se requiere la cantidad para crear el detalle de venta")
+            return res.status(400).json({mensaje: "se requiere la cantidad para crear el detalle de venta"})
+        }
+
+        if (!datos.precio_unitario) {
+            console.log("se requiere el precio unitario para crear el detalle de venta")
+            return res.status(400).json({mensaje: "se requiere el precio unitario para crear el detalle de venta"})
+        }
+
+        if (!datos.sub_total) {
+            console.log("se requiere el sub total para crear el detalle de venta")
+            return res.status(400).json({mensaje: "se requiere el sub total para crear el detalle de venta"})
+        }
+
+        const result = await service.crearDetalleVenta(datos);
         res.status(201).json(result);
     } catch (err) {
         next(err);
@@ -41,10 +62,11 @@ export const crearDetalleVenta = async (req, res, next) => {
 };
 
 export const actualizarDetalleVenta = async (req, res, next) => {
+    const { id } = req.params;
+    const datos = req.body;
+
     try {
-        const { id } = req.params;
-        const data = req.body;
-        const result = await service.actualizarDetalleVenta(id, data);
+        const result = await service.actualizarDetalleVenta(id, datos);
         if (!result) {
             return res.status(404).json({ message: 'Detalle de venta no encontrado' });
         }
@@ -55,13 +77,16 @@ export const actualizarDetalleVenta = async (req, res, next) => {
 };
 
 export const eliminarDetalleVenta = async (req, res, next) => {
+    const { id } = req.params;
+
     try {
-        const { id } = req.params;
         const result = await service.eliminarDetalleVenta(id);
-        if (!result || result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Detalle de venta no encontrado' });
+        if (!result || result.length === 0) {
+            console.log(`no existen datos de este detalle de venta o ya fue eliminado`)
+            return res.status(404).json({ message:`no existen datos de este detalle de venta o ya fue eliminado`});
         }
-        res.status(200).json({ message: 'Detalle de venta eliminado correctamente' });
+        
+        res.status(200).json(result);
     } catch (err) {
         next(err);
     }

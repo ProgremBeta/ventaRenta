@@ -8,8 +8,8 @@ const router = express.Router();
 
 router.get('/',controller.obtenerRoles);
 router.get('/:id', controller.obtenerRolPorId);
-router.post('/', verificarOperador, controller.crearRol);
-router.put('/:id', verificarOperador, controller.actualizarRol);
-router.delete('/:id', verificarOperador, controller.eliminarRol);
+router.post('/', controller.crearRol);
+router.put('/:id', controller.actualizarRol);
+router.delete('/:id', controller.eliminarRol);
 
 export default router;

@@ -2,10 +2,7 @@ import * as respository from './detalles_ventas.repository.js';
 
 export const obtenerDetallesVentas = async (req, res) => {
     const result = await respository.obtenerDetallesVentas();
-    
-    console.log("resultado de detalle de venta en service: ", result);
-
-    return result;
+    return result.rows;
 };
 
 export const obtenerDetalleVentaPorId = async (id) => {
@@ -13,13 +10,13 @@ export const obtenerDetalleVentaPorId = async (id) => {
     return result.rows;
 };
 
-export const crearDetalleVenta = async (data) => {
-    const result = await respository.crearDetalleVenta(data.id_venta, data.id_producto, data.cantidad, data.precio_unitario);
+export const crearDetalleVenta = async (datos) => {
+    const result = await respository.crearDetalleVenta(datos);
     return result.rows;
 };
 
-export const actualizarDetalleVenta = async (id, data) => {
-    const result = await respository.actualizarDetalleVenta(id, data.id_venta, data.id_producto, data.cantidad, data.precio_unitario);
+export const actualizarDetalleVenta = async (id, datos) => {
+    const result = await respository.actualizarDetalleVenta(id,datos);
     return result.rows;
 };
 

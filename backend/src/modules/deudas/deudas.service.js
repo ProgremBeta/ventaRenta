@@ -6,25 +6,25 @@ export const obtenerDeudas = async () => {
 
     console.log(result);
 
-    return result[0];
+    return result.rows;
 }
 
-export const obtenerDeudasPorId = async (id) => {
-    const result = await repository.obtenerDeudasPorId(id);
-    return result[0];
+export const obtenerDeudaPorId = async (id) => {
+    const result = await repository.obtenerDeudaPorId(id);
+    return result.rows;
 }
 
-export const crearDeuda = async (data) => {
-    const result = await repository.crearDeuda(data);
-    return result;
+export const crearDeuda = async (datos) => {
+    const result = await repository.crearDeuda(datos);
+    return result.rows;
 }
 
-export const actualizarDeudas = async (id, data) => {
-    const result = await repository.actualizarDeuda(id,data);
-    return result;
+export const actualizarDeuda = async (id, datos) => {
+    const result = await repository.actualizarDeuda(id,datos);
+    return result.rows;
 }
 
 export const eliminarDeuda = async (id ) => {
     const result = await repository.eliminarDeuda(id);
-    return result
+    return result.rows
 }

@@ -21,8 +21,8 @@ export const crearRenta = async (datos) => {
       estado
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
     [
-      datos.cliente_id,
       datos.usuario_id,
+      datos.cliente_id,
       datos.fecha_inicio,
       datos.fecha_fin,
       datos.tiempo_total,

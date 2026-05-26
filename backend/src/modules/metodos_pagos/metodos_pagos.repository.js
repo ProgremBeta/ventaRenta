@@ -1,11 +1,11 @@
 import Pool from '../../config/db.config.js';
 
-export const obtenerMetodosPago = async () => {
+export const obtenerMetodosPagos = async () => {
   return await Pool.query('SELECT * FROM metodos_pagos');
 }
 
 export const obtenerMetodoPagoPorId = async (id) => {
-  return await Pool.query('SELECT * FROM metodos_pagos WHERE id = $1', [id]);
+  return await Pool.query('SELECT * FROM metodos_pagos WHERE id=$1', [id]);
 }
 
 export const crearMetodoPago = async (datos) => {

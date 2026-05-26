@@ -1,5 +1,5 @@
 import express from 'express';
-import * as controller from './crear_deuda.controller.js';
+import * as controller from './nueva_deuda.controller.js';
 
 const routes = express.Router();
 

@@ -5,12 +5,12 @@ export const obtenerUsuarios = async () => {
   return result.rows;
 }
 
-export const obtenerUsuarioPorId = async (id) => {
-  const result = await repository.obtenerUsuarioPorId(id);
+export const obtenerUsuarioPorIdentificacion = async (id) => {
+  const result = await repository.obtenerUsuarioPorIdentificacion(id);
   return result.rows;
 }
 
-export const crearUsuario = async (datos, rolUsuario) => {
+export const crearUsuario = async (datos) => {
   const result = await repository.crearUsuario(datos);
   return result.rows;
 }
@@ -29,10 +29,10 @@ export const actualizarUsuario = async (id, datos) => {
   }
 
   const result = await repository.actualizarUsuario(id, camposActualizar)
-  return result.rows[0];
+  return result.rows;
 }
 
 export const eliminarUsuario = async (id) => {
   const result = await repository.eliminarUsuario(id);
-  return result.rows[0];
+  return result.rows;
 }

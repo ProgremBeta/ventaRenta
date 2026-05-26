@@ -5,12 +5,12 @@ export const obtenerCategoriasProductos = async () => {
 };
 
 export const obtenerCategoriaProductoPorId = async (id) => {
-  return await pool.query('SELECT * FROM categorias_productos WHERE id =$1', [id]);
+  return await pool.query('SELECT * FROM categorias_productos WHERE id=$1', [id]);
 };
 
 export const crearCategoriaProducto = async (datos) => {
   return await pool.query(`
-    INSERT INTO categorias_producto (
+    INSERT INTO categorias_productos(
       nombre,
       descripcion,
       activo

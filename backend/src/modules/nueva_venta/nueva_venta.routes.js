@@ -1,5 +1,5 @@
 import express from 'express';
-import * as controller from './crear_venta.controller.js';
+import * as controller from './nueva_venta.controller.js';
 
 const routes = express.Router();
 

@@ -16,7 +16,7 @@ export const hacerLogin = async (datos) => {
     throw new Error("tiene que ingresar el ID del usuario ")
   }
 
-  const result = await usuarioRepository.obtenerUsuarioPorId(identificacion);
+  const result = await usuarioRepository.obtenerUsuarioPorIdentificacion(identificacion);
 
   if (!result || result.rows.length === 0) {
     throw new Error("Usuario no existe");

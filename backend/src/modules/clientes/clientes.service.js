@@ -15,13 +15,14 @@ export const sumarPuntosCliente = async (id, puntos) => {
     return result.rows;
 }
 
-export const crearCliente = async (cliente) => {
-    const result = await repository.crearCliente(cliente);
+export const crearCliente = async (datos) => {
+    const result = await repository.crearCliente(datos);
     return result.rows;
 }
 
-export const actualizarCliente = async (id, cliente) => {
-    const result = await repository.actualizarCliente(id, cliente);
+export const actualizarCliente = async (id, datos) => {
+    const result = await repository.actualizarCliente(id, datos);
+
     return result.rows;
 }
 

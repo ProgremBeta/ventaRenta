@@ -4,7 +4,7 @@ export const obtenerUsuarios = async () => {
   return await pool.query('SELECT * FROM usuarios');
 };
 
-export const obtenerUsuarioPorId = async (id) => {
+export const obtenerUsuarioPorIdentificacion = async (id) => {
   return await pool.query('SELECT * FROM usuarios WHERE identificacion = $1', [id]);
 };
 

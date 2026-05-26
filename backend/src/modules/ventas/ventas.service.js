@@ -7,20 +7,20 @@ export const obtenerVentas = async () => {
 
 export const obtenerVentaPorId = async (id) => {
   const venta = await repository.obtenerVentaPorId(id);
-  return venta.rows[0];
+  return venta.rows;
 }
 
 export const crearVenta = async (datos) => {
   const nuevaVenta = await repository.crearVenta(datos);
-  return nuevaVenta.rows[0];
+  return nuevaVenta.rows;
 }
 
 export const actualizarVenta = async (id, datos) => {
   const ventaActualizada = await repository.actualizarVenta(id, datos);
-  return ventaActualizada.rows[0];
+  return ventaActualizada.rows;
 }
 
 export const eliminarVenta = async (id) => {
   const ventaEliminada = await repository.eliminarVenta(id);
-  return ventaEliminada.rows[0];
+  return ventaEliminada.rows;
 }

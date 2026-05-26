@@ -7,17 +7,18 @@ import categoriasDispositivosRoutes from './modules/categorias_dispositivos/cate
 import rolesRoutes from './modules/roles/roles.routes.js';
 
 //rutas del flujo principal de la aplicación
-import nuevaVentaRoutes from './modules/crear_venta/crear_venta.routes.js';
-import nuevoProductoRoutes from './modules/crear_producto/crear_productos.routes.js';
-import nuevoUsuarioRoutes from './modules/crear_usuario/crear_usuario.routes.js';
+import nuevaVentaRoutes from './modules/nueva_venta/nueva_venta.routes.js';
+import nuevoProductoRoutes from './modules/nuevo_producto/nuevo_producto.routes.js';
+import nuevoUsuarioRoutes from './modules/nuevo_usuario/nuevo_usuario.routes.js';
 import inicarRentaRoutes from './modules/iniciar_renta/iniciar_renta.routes.js';
-import crearDeudaRoutes from './modules/crear_deuda/crear_deuda.routes.js';
+import nuevaDeudaRoutes from './modules/nueva_deuda/nueva_deuda.routes.js';
 import pagoDeudaRoutes from './modules/pago_deuda/pago_deuda.routes.js';
 
 //flujo segundario
 import usuarioRoutes from './modules/usuarios/usuarios.routes.js';
 import productosRoutes from './modules/productos/productos.routes.js';
 import ventasRoutes from './modules/ventas/ventas.routes.js';
+import detallesRentasRoutes from './modules/detalles_rentas/detalles_rentas.routes.js';
 import detallesVentasRoutes from './modules/detalles_ventas/detalles_ventas.routes.js';
 import rentasRoutes from './modules/rentas/rentas.routes.js';
 import deudasRoutes from './modules/deudas/deudas.routes.js';
@@ -49,18 +50,19 @@ app.use('/api/categorias_dispositivos', verificarToken, categoriasDispositivosRo
 app.use('/api/roles', rolesRoutes);
 
 //rutas del flujo principal de la aplicación
+app.use('/api/nueva_deuda', verificarToken, verificarOperador, nuevaDeudaRoutes);
 app.use('/api/nueva_venta', verificarToken, verificarOperador, nuevaVentaRoutes);
 app.use('/api/nuevo_producto', verificarToken, verificarOperador, nuevoProductoRoutes);
 app.use('/api/nuevo_usuario', nuevoUsuarioRoutes);
 app.use('/api/iniciar_renta', verificarToken, verificarOperador, inicarRentaRoutes);
-app.use('/api/crear_deuda', verificarToken, verificarOperador, crearDeudaRoutes);
 app.use('/api/pago_deuda', verificarToken, verificarOperador, pagoDeudaRoutes);
 
 //flujo segundario
 app.use('/api/usuarios', verificarToken, usuarioRoutes);
 app.use('/api/productos', verificarToken, productosRoutes);
 app.use('/api/ventas', verificarToken ,ventasRoutes);
-app.use('/api/detalles_ventas', verificarToken, detallesVentasRoutes);
+app.use('/api/detalles_rentas',verificarToken, detallesRentasRoutes);
+app.use('/api/detalles_ventas',verificarToken, detallesVentasRoutes);
 app.use('/api/rentas', verificarToken, rentasRoutes);
 app.use('/api/deudas', verificarToken, deudasRoutes);
 app.use('/api/inventario_productos', verificarToken, inventarioProductosRoutes);

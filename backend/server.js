@@ -9,6 +9,11 @@ console.log("Variables de entorno cargadas, server.js ")
 //Llamo la variable de entorno PORT para el puerto
 const PORT = process.env.PORT || 3000;
 
+if (PORT === 3000) 
+{
+  console.log("No has declarado el puerto en el .env")
+}
+
 app.listen(PORT, () => {
-  console.log(`El servidor en ejecucion`);
+  console.log(`El servidor en ejecucion http://localhost:${PORT}/`);
 });

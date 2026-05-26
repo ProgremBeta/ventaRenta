@@ -1,7 +1,7 @@
 export const gestorErrores = (err, req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} → ${err.message}`)
 
-  console.log('el error es:' + err)
+  console.log('el error es: ' , err)
   //Error por mal formato de JSON
   if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'El cuerpo de la petición no es un JSON válido' })
 

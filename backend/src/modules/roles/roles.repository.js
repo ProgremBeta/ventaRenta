@@ -7,7 +7,7 @@ export const obtenerRoles = async () => {
 };
 
 export const obtenerRolPorId = async (id) => {
-  return await pool.query('SELECT * FROM roles WHERE id =$1', [id]);
+  return await pool.query('SELECT * FROM roles WHERE id = $1', [id]);
 };
 
 export const crearRol = async (datos) => {

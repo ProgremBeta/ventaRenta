@@ -2,25 +2,25 @@ import * as respository from './pagos_deudas.repository.js';
 
 export const obtenerPagosDeudas = async () => {
     const result = await respository.obtenerPagosDeudas();
-    return result[0];
+    return result.rows;
 }
 
-export const obtenerPagosDeudasPorId = async (id) => {
-    const result = await respository.obtenerPagosDeudasPorId(id);
-    return result[0];
+export const obtenerPagoDeudaPorId = async (id) => {
+    const result = await respository.obtenerPagoDeudaPorId(id);
+    return result.rows;
 }
 
-export const crearPagoDeuda = async (data) => {
-    const result = await respository.crearPagoDeuda(data);
-    return result[0];
+export const crearPagoDeuda = async (datos) => {
+    const result = await respository.crearPagoDeuda(datos);
+    return result.rows;
 }
 
-export const actualizarPagoDeuda = async (id, data) => {
-    const result = await respository.actualizarPagoDeuda(id,data);
-    return result[0];
+export const actualizarPagoDeuda = async (id, datos) => {
+    const result = await respository.actualizarPagoDeuda(id,datos);
+    return result.rows;
 }
 
 export const eliminarPagoDeuda = async (id ) => {
     const result = await respository.eliminarPagoDeuda(id);
-    return result[0]
+    return result.rows;
 }
