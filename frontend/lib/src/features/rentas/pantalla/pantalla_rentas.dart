@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/src/core/models/renta.dart';
+
 import 'package:frontend/src/core/themes/color_app.dart';
 import 'package:frontend/src/core/widgets/item_lista.dart';
 import 'package:frontend/src/core/widgets/toast_notificacion.dart';
+import 'package:frontend/src/core/providers/auth_provider.dart';
 import 'package:frontend/src/features/rentas/provider/rentas_provider.dart';
 
 class PantallaRentas extends StatefulWidget {
@@ -18,34 +20,150 @@ class _PantallaRentasState extends State<PantallaRentas> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<RentasProvider>().fetchRentas();
+      final p = context.read<RentasProvider>();
+      p.fetchRentas();
+      p.fetchClientes();
+      p.fetchDispositivos();
     });
   }
 
+  String _nombreCliente(RentasProvider p, int? clienteId) {
+    if (clienteId == null) return 'Sin cliente';
+    final c = p.clientes.where((c) => c.id == clienteId).firstOrNull;
+    return c?.nombre ?? 'Cliente #$clienteId';
+  }
+
+  String _nombreDispositivo(RentasProvider p, int? dispositivoId) {
+    if (dispositivoId == null) return '—';
+    final d = p.dispositivos.where((d) => d.id == dispositivoId).firstOrNull;
+    return d?.nombre ?? 'Disp #$dispositivoId';
+  }
+
   void _mostrarDetalle(Renta renta) {
+    final provider = context.read<RentasProvider>();
+    provider.fetchDetalleRenta(renta.id);
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ColorApp.colorSegundario,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Renta #${renta.id}', style: const TextStyle(color: ColorApp.colorTitulo)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _detalleRow('Cliente ID', renta.clienteId?.toString() ?? '—'),
-            _detalleRow('Inicio', renta.fechaInicio ?? '—'),
-            _detalleRow('Fin', renta.fechaFin ?? '—'),
-            _detalleRow('Total', renta.precioTotal != null ? '\$${renta.precioTotal!.toStringAsFixed(2)}' : '—'),
-            _detalleRow('Estado', renta.estado ?? '—'),
-          ],
+        content: Consumer<RentasProvider>(
+          builder: (context, p, _) {
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _detalleRow('Usuario ID', renta.usuarioId?.toString() ?? '—'),
+                  _detalleRow('Cliente', _nombreCliente(p, renta.clienteId)),
+                  _detalleRow('Inicio', renta.fechaInicio ?? '—'),
+                  _detalleRow('Fin', renta.fechaFin ?? '—'),
+                  _detalleRow('Tiempo total', renta.tiempoTotal ?? '—'),
+                  _detalleRow('Precio total', renta.precioTotal != null ? '\$${renta.precioTotal!.toStringAsFixed(2)}' : '—'),
+                  _detalleRow('Método pago', renta.metodoPago?.toString() ?? '—'),
+                  _detalleRow('Estado', renta.estado ?? '—'),
+                  if (p.detalleActual.isNotEmpty) ...[
+                    const Divider(color: ColorApp.colorBordeInput, height: 24),
+                    const Text('Dispositivos', style: TextStyle(color: ColorApp.colorTitulo, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    ...p.detalleActual.map((d) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _nombreDispositivo(p, d.dispositivoId),
+                                style: const TextStyle(color: ColorApp.colorTexto),
+                              ),
+                            ),
+                            Text(d.tiempoTotal ?? '', style: const TextStyle(color: ColorApp.colorSubTitulo)),
+                            const SizedBox(width: 12),
+                            Text(
+                              d.subTotal != null ? '\$${d.subTotal!.toStringAsFixed(0)}' : '—',
+                              style: const TextStyle(color: ColorApp.colorAcento, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ],
+              ),
+            );
+          },
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cerrar', style: TextStyle(color: ColorApp.colorAcento)),
+            child: const Text('Cerrar', style: TextStyle(color: ColorApp.colorTextoMuted)),
           ),
+          if (renta.estado == 'activa')
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _mostrarFinalizarRenta(renta);
+              },
+              icon: const Icon(Icons.check_circle, color: Colors.white, size: 18),
+              label: const Text('Finalizar renta'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorApp.colorExito,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                elevation: 0,
+              ),
+            ),
         ],
+      ),
+    );
+  }
+
+  void _mostrarFinalizarRenta(Renta renta) {
+    bool enviando = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: ColorApp.colorSegundario,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Finalizar renta', style: TextStyle(color: ColorApp.colorTitulo)),
+          content: Text(
+            '¿Estás seguro de finalizar la renta #${renta.id}?',
+            style: const TextStyle(color: ColorApp.colorTexto),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar', style: TextStyle(color: ColorApp.colorTextoMuted)),
+            ),
+            ElevatedButton.icon(
+              onPressed: enviando ? null : () async {
+                setState(() => enviando = true);
+                final exito = await context.read<RentasProvider>().finalizarRenta(renta.id);
+                if (!ctx.mounted) return;
+                Navigator.pop(ctx);
+                ToastNotificacion.mostrar(
+                  context,
+                  mensaje: exito ? 'Renta finalizada' : 'Error al finalizar renta',
+                  tipo: exito ? TipoToast.exito : TipoToast.error,
+                );
+              },
+              icon: const Icon(Icons.check, color: Colors.white, size: 18),
+              label: enviando
+                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Text('Confirmar'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorApp.colorExito,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                elevation: 0,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -63,12 +181,14 @@ class _PantallaRentasState extends State<PantallaRentas> {
 
   Widget _detalleRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(color: ColorApp.colorSubTitulo, fontSize: 14)),
-          Text(value, style: const TextStyle(color: ColorApp.colorTexto, fontSize: 14, fontWeight: FontWeight.w500)),
+          Flexible(
+            child: Text(value, style: const TextStyle(color: ColorApp.colorTexto, fontSize: 14, fontWeight: FontWeight.w500), textAlign: TextAlign.right),
+          ),
         ],
       ),
     );
@@ -117,14 +237,10 @@ class _PantallaRentasState extends State<PantallaRentas> {
         itemCount: provider.rentas.length,
         itemBuilder: (context, index) {
           final renta = provider.rentas[index];
-          final estado = renta.estado ?? 'desconocido';
-          final colorEstado = estado == 'activa' ? ColorApp.colorExito : ColorApp.colorTextoMuted;
           return ItemLista(
-            titulo: 'Renta #${renta.id}',
-            subtitulo: renta.clienteId != null ? 'Cliente: #${renta.clienteId}' : 'Sin cliente',
-            detalle: renta.precioTotal != null ? '\$${renta.precioTotal!.toStringAsFixed(0)}' : null,
-            icono: Icons.videogame_asset,
-            colorIcono: colorEstado,
+            titulo: _nombreCliente(provider, renta.clienteId),
+            subtitulo: '${renta.fechaInicio ?? '—'} → ${renta.fechaFin ?? '—'}  |  ${renta.estado ?? '—'}',
+            detalle: renta.tiempoTotal ?? '',
             onTap: () => _mostrarDetalle(renta),
           );
         },
@@ -186,6 +302,7 @@ class _FormularioNuevaRentaState extends State<_FormularioNuevaRenta> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<RentasProvider>();
+    final auth = context.read<AuthProvider>();
 
     return AlertDialog(
       backgroundColor: ColorApp.colorSegundario,
@@ -198,9 +315,12 @@ class _FormularioNuevaRentaState extends State<_FormularioNuevaRenta> {
           children: [
             DropdownButtonFormField<int>(
               value: _clienteId,
-              items: provider.clientes.map((c) {
-                return DropdownMenuItem(value: c.id, child: Text(c.nombre, style: const TextStyle(color: ColorApp.colorTexto)));
-              }).toList(),
+              items: [
+                const DropdownMenuItem(value: null, child: Text('Ninguno', style: TextStyle(color: ColorApp.colorTextoMuted))),
+                ...provider.clientes.map((c) {
+                  return DropdownMenuItem(value: c.id, child: Text(c.nombre, style: const TextStyle(color: ColorApp.colorTexto)));
+                }),
+              ],
               onChanged: (v) => _clienteId = v,
               decoration: _inputDeco('Cliente'),
               dropdownColor: ColorApp.colorElevado,
@@ -247,14 +367,14 @@ class _FormularioNuevaRentaState extends State<_FormularioNuevaRenta> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancelar', style: TextStyle(color: ColorApp.colorTextoMuted)),
         ),
-        ElevatedButton(
+        ElevatedButton.icon(
           onPressed: _enviando ? null : () async {
             if (!_formKey.currentState!.validate()) return;
             setState(() => _enviando = true);
 
             final data = {
-              'cliente_id': _clienteId,
-              'usuario_id': 1,
+              if (_clienteId != null) 'cliente_id': _clienteId,
+              'usuario_id': auth.userRolId ?? 1,
               'fecha_inicio': _fechaInicio.toIso8601String(),
               'fecha_fin': _fechaFin.toIso8601String(),
               'metodo_pago': 1,
@@ -274,15 +394,16 @@ class _FormularioNuevaRentaState extends State<_FormularioNuevaRenta> {
               ToastNotificacion.mostrar(context, mensaje: 'Error al iniciar renta', tipo: TipoToast.error);
             }
           },
+          icon: const Icon(Icons.check, color: Colors.white, size: 18),
+          label: _enviando
+              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : const Text('Iniciar Renta'),
           style: ElevatedButton.styleFrom(
             backgroundColor: ColorApp.colorAcento,
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             elevation: 0,
           ),
-          child: _enviando
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Text('Iniciar Renta'),
         ),
       ],
     );

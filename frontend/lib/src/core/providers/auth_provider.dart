@@ -12,12 +12,14 @@ class AuthProvider extends ChangeNotifier {
   String? _error;
   String? _userName;
   int? _userRolId;
+  String? _userIdentificacion;
 
   bool get isAuthenticated => _isAuthenticated;
   bool get isLoading => _isLoading;
   String? get error => _error;
   String? get userName => _userName;
   int? get userRolId => _userRolId;
+  String? get userIdentificacion => _userIdentificacion;
 
   Future<void> verificarSesion() async {
     final token = await _storage.leerToken();
@@ -43,6 +45,7 @@ class AuthProvider extends ChangeNotifier {
       _isAuthenticated = true;
       _userName = data.nombre;
       _userRolId = data.rolId;
+      _userIdentificacion = identificacion;
       notifyListeners();
       return true;
     } else {
@@ -57,6 +60,7 @@ class AuthProvider extends ChangeNotifier {
     _isAuthenticated = false;
     _userName = null;
     _userRolId = null;
+    _userIdentificacion = null;
     notifyListeners();
     context.go('/login');
   }

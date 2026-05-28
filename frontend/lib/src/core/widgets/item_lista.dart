@@ -6,8 +6,6 @@ class ItemLista extends StatelessWidget {
   final String titulo;
   final String? subtitulo;
   final String? detalle;
-  final IconData? icono;
-  final Color? colorIcono;
   final VoidCallback? onTap;
 
   const ItemLista({
@@ -15,8 +13,6 @@ class ItemLista extends StatelessWidget {
     required this.titulo,
     this.subtitulo,
     this.detalle,
-    this.icono,
-    this.colorIcono,
     this.onTap,
   });
 
@@ -41,10 +37,6 @@ class ItemLista extends StatelessWidget {
             ),
             child: Row(
               children: [
-                if (icono != null) ...[
-                  Icon(icono, color: colorIcono ?? ColorApp.colorAcento, size: 28),
-                  const SizedBox(width: 12),
-                ],
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,9 +71,7 @@ class ItemLista extends StatelessWidget {
                       fontSize: 13,
                     ),
                   ),
-                const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, color: ColorApp.colorTextoMuted, size: 20),
-              ],
+                ],
             ),
           ),
         ),

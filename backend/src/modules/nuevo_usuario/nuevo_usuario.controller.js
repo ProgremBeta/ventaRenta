@@ -1,4 +1,6 @@
 import * as service from './nuevo_usuario.service.js';
+import { obtenerUsuarios } from '../usuarios/usuarios.service.js';
+import { obtenerRoles, crearRol } from '../roles/roles.service.js';
 
 export const crearNuevoUsuario = async (req, res, next) => {
   const datos = req.body;
@@ -6,11 +8,26 @@ export const crearNuevoUsuario = async (req, res, next) => {
   let rolUsuario
 
   if(req.usuarioLogeado == null){
-    rolUsuario = 2
+
+    const primerUsusario = await obtenerUsuarios();
+
+    if (primerUsusario[0].nombre === "ad") {
+
+      const datos = {"nombre": "administrador"}
+
+      await crearRol(datos);
+
+      rolUsuario = obtenerRoles()[0].rol_id
+      console.log("el rol nuevo es:", rolUsuario)
+    }else{
+      rolUsuario = 2
+    }
   }
   else{
     rolUsuario = req.usuarioLogeado?.rol_id;
   }
+
+  console.log("el rol del usuario es: ", rolUsuario)
     
   try {
     let result;

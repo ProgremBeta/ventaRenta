@@ -22,6 +22,7 @@ import detallesRentasRoutes from './modules/detalles_rentas/detalles_rentas.rout
 import detallesVentasRoutes from './modules/detalles_ventas/detalles_ventas.routes.js';
 import rentasRoutes from './modules/rentas/rentas.routes.js';
 import deudasRoutes from './modules/deudas/deudas.routes.js';
+import dispositivosRoutes from './modules/dispositivos/dispositivos.routes.js';
 import inventarioProductosRoutes from './modules/inventario_productos/inventario_productos.routes.js';
 import clientesRoutes from './modules/clientes/clientes.routes.js';
 import pagoDeudasRoutes from './modules/pagos_deudas/pagos_deudas.routes.js';
@@ -58,13 +59,14 @@ app.use('/api/iniciar_renta', verificarToken, verificarOperador, inicarRentaRout
 app.use('/api/pago_deuda', verificarToken, verificarOperador, pagoDeudaRoutes);
 
 //flujo segundario
-app.use('/api/usuarios', verificarToken, usuarioRoutes);
+app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/productos', verificarToken, productosRoutes);
 app.use('/api/ventas', verificarToken ,ventasRoutes);
 app.use('/api/detalles_rentas',verificarToken, detallesRentasRoutes);
 app.use('/api/detalles_ventas',verificarToken, detallesVentasRoutes);
 app.use('/api/rentas', verificarToken, rentasRoutes);
 app.use('/api/deudas', verificarToken, deudasRoutes);
+app.use('/api/dispositivos', verificarToken, dispositivosRoutes);
 app.use('/api/inventario_productos', verificarToken, inventarioProductosRoutes);
 app.use('/api/clientes', verificarToken, clientesRoutes);
 app.use('/api/pagos_deudas', verificarToken, pagoDeudasRoutes);

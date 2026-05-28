@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:frontend/src/core/models/cliente.dart';
+import 'package:frontend/src/core/models/detalle_renta.dart';
 import 'package:frontend/src/core/models/dispositivo.dart';
 import 'package:frontend/src/core/models/renta.dart';
 import 'package:frontend/src/features/rentas/service/rentas_service.dart';
@@ -10,12 +11,14 @@ class RentasProvider extends ChangeNotifier {
   List<Renta> _rentas = [];
   List<Cliente> _clientes = [];
   List<Dispositivo> _dispositivos = [];
+  List<DetalleRenta> _detalleActual = [];
   bool _isLoading = false;
   String? _error;
 
   List<Renta> get rentas => _rentas;
   List<Cliente> get clientes => _clientes;
   List<Dispositivo> get dispositivos => _dispositivos;
+  List<DetalleRenta> get detalleActual => _detalleActual;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -47,5 +50,19 @@ class RentasProvider extends ChangeNotifier {
       return true;
     }
     return false;
+  }
+
+  Future<bool> finalizarRenta(int id) async {
+    final result = await _service.actualizarRenta(id, {'estado': 'finalizada'});
+    if (result != null) {
+      await fetchRentas();
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> fetchDetalleRenta(int rentaId) async {
+    _detalleActual = await _service.detalleRenta(rentaId);
+    notifyListeners();
   }
 }

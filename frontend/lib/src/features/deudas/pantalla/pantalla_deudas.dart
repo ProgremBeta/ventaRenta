@@ -18,35 +18,76 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DeudasProvider>().fetchDeudas();
+      final p = context.read<DeudasProvider>();
+      p.fetchDeudas();
+      p.fetchClientes();
     });
   }
 
-  void _mostrarDetalleConPago(Deuda deuda) {
-    final montoCtrl = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-
+  void _mostrarDetalle(Deuda deuda) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ColorApp.colorSegundario,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Deuda #${deuda.id}', style: const TextStyle(color: ColorApp.colorTitulo)),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _detalleRow('Cliente ID', deuda.clienteId?.toString() ?? '—'),
-              _detalleRow('Monto total', '\$${deuda.montoTotal?.toStringAsFixed(2) ?? '0.00'}'),
-              _detalleRow('Pagado', '\$${deuda.montoPagado?.toStringAsFixed(2) ?? '0.00'}'),
-              _detalleRow('Saldo pendiente', '\$${deuda.saldo?.toStringAsFixed(2) ?? '0.00'}'),
-              _detalleRow('Estado', deuda.estado ?? '—'),
-              if (deuda.estado != 'pagado') ...[
-                const Divider(color: ColorApp.colorBordeInput, height: 24),
-                const Text('Pagar deuda', style: TextStyle(color: ColorApp.colorTitulo, fontWeight: FontWeight.w600, fontSize: 15)),
-                const SizedBox(height: 8),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _detalleRow('Cliente', _nombreCliente(deuda.clienteId)),
+            _detalleRow('Monto total', '\$${deuda.montoTotal?.toStringAsFixed(2) ?? '0.00'}'),
+            _detalleRow('Pagado', '\$${deuda.montoPagado?.toStringAsFixed(2) ?? '0.00'}'),
+            _detalleRow('Saldo pendiente', '\$${deuda.saldo?.toStringAsFixed(2) ?? '0.00'}'),
+            _detalleRow('Estado', deuda.estado ?? '—'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cerrar', style: TextStyle(color: ColorApp.colorTextoMuted)),
+          ),
+          if (deuda.estado != 'pagado')
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _mostrarPagoDeuda(deuda);
+              },
+              icon: const Icon(Icons.payments, color: Colors.white, size: 18),
+              label: const Text('Pagar deuda'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorApp.colorExito,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                elevation: 0,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _mostrarPagoDeuda(Deuda deuda) {
+    final montoCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool enviando = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: ColorApp.colorSegundario,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Pagar deuda', style: TextStyle(color: ColorApp.colorTitulo)),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Deuda #${deuda.id} — Saldo: \$${deuda.saldo?.toStringAsFixed(2) ?? '0.00'}',
+                    style: const TextStyle(color: ColorApp.colorSubTitulo)),
+                const SizedBox(height: 12),
                 TextFormField(
                   controller: montoCtrl,
                   keyboardType: TextInputType.number,
@@ -81,99 +122,6 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
                   },
                 ),
               ],
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cerrar', style: TextStyle(color: ColorApp.colorAcento)),
-          ),
-          if (deuda.estado != 'pagado')
-            ElevatedButton(
-              onPressed: () async {
-                if (!formKey.currentState!.validate()) return;
-                final monto = double.tryParse(montoCtrl.text) ?? 0;
-
-                final exito = await context.read<DeudasProvider>().pagarDeuda({
-                  'deuda_id': deuda.id,
-                  'monto': monto,
-                  'metodo_pago': 1,
-                });
-
-                if (!ctx.mounted) return;
-                Navigator.pop(ctx);
-
-                ToastNotificacion.mostrar(
-                  context,
-                  mensaje: exito ? 'Pago registrado con éxito' : 'Error al registrar pago',
-                  tipo: exito ? TipoToast.exito : TipoToast.error,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorApp.colorExito,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                elevation: 0,
-              ),
-              child: const Text('Pagar'),
-            ),
-        ],
-      ),
-    );
-  }
-
-  void _mostrarFormulario() {
-    final provider = context.read<DeudasProvider>();
-    provider.fetchClientes();
-
-    final origenIdCtrl = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-    String? origenTipo = 'venta';
-    int? clienteId;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: ColorApp.colorSegundario,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Nueva Deuda', style: TextStyle(color: ColorApp.colorTitulo)),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DropdownButtonFormField<int>(
-                  value: clienteId,
-                  items: provider.clientes.map((c) {
-                    return DropdownMenuItem(value: c.id, child: Text(c.nombre, style: const TextStyle(color: ColorApp.colorTexto)));
-                  }).toList(),
-                  onChanged: (v) => setDialogState(() => clienteId = v),
-                  decoration: _inputDeco('Cliente'),
-                  dropdownColor: ColorApp.colorElevado,
-                  style: const TextStyle(color: ColorApp.colorTexto),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: origenTipo,
-                  items: const [
-                    DropdownMenuItem(value: 'venta', child: Text('Venta', style: TextStyle(color: ColorApp.colorTexto))),
-                    DropdownMenuItem(value: 'renta', child: Text('Renta', style: TextStyle(color: ColorApp.colorTexto))),
-                  ],
-                  onChanged: (v) => setDialogState(() => origenTipo = v!),
-                  decoration: _inputDeco('Origen'),
-                  dropdownColor: ColorApp.colorElevado,
-                  style: const TextStyle(color: ColorApp.colorTexto),
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: origenIdCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: _inputDeco('ID de $origenTipo'),
-                  style: const TextStyle(color: ColorApp.colorTexto),
-                ),
-              ],
             ),
           ),
           actions: [
@@ -181,34 +129,46 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
               onPressed: () => Navigator.pop(ctx),
               child: const Text('Cancelar', style: TextStyle(color: ColorApp.colorTextoMuted)),
             ),
-            ElevatedButton(
-              onPressed: () async {
+            ElevatedButton.icon(
+              onPressed: enviando ? null : () async {
                 if (!formKey.currentState!.validate()) return;
-                final exito = await context.read<DeudasProvider>().crearDeuda({
-                  'cliente_id': clienteId,
-                  'origen_tipo': origenTipo,
-                  'origen_id': int.tryParse(origenIdCtrl.text),
+                setState(() => enviando = true);
+                final monto = double.tryParse(montoCtrl.text) ?? 0;
+                final exito = await context.read<DeudasProvider>().pagarDeuda({
+                  'deuda_id': deuda.id,
+                  'monto': monto,
+                  'metodo_pago': 1,
                 });
                 if (!ctx.mounted) return;
                 Navigator.pop(ctx);
                 ToastNotificacion.mostrar(
                   context,
-                  mensaje: exito ? 'Deuda creada con éxito' : 'Error al crear deuda',
+                  mensaje: exito ? 'Pago registrado con éxito' : 'Error al registrar pago',
                   tipo: exito ? TipoToast.exito : TipoToast.error,
                 );
               },
+              icon: const Icon(Icons.check, color: Colors.white, size: 18),
+              label: enviando
+                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Text('Pagar'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: ColorApp.colorAcento,
+                backgroundColor: ColorApp.colorExito,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 elevation: 0,
               ),
-              child: const Text('Crear Deuda'),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _nombreCliente(int? clienteId) {
+    if (clienteId == null) return 'Sin cliente';
+    final provider = context.read<DeudasProvider>();
+    final c = provider.clientes.where((c) => c.id == clienteId).firstOrNull;
+    return c?.nombre ?? 'Cliente #$clienteId';
   }
 
   Widget _detalleRow(String label, String value) {
@@ -257,11 +217,7 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
         titleTextStyle: const TextStyle(color: ColorApp.colorTitulo, fontSize: 20, fontWeight: FontWeight.bold),
         elevation: 0,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _mostrarFormulario,
-        backgroundColor: ColorApp.colorAcento,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+
       body: _buildBody(provider),
     );
   }
@@ -288,15 +244,34 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
         itemCount: provider.deudas.length,
         itemBuilder: (context, index) {
           final deuda = provider.deudas[index];
-          final estado = deuda.estado ?? 'desconocido';
-          final colorEstado = estado == 'pagado' ? ColorApp.colorExito : ColorApp.colorAdvertencia;
-          return ItemLista(
-            titulo: 'Deuda #${deuda.id}',
-            subtitulo: deuda.clienteId != null ? 'Cliente: #${deuda.clienteId}' : 'Sin cliente',
-            detalle: '\$${deuda.saldo?.toStringAsFixed(0) ?? '0'}',
-            icono: Icons.account_balance,
-            colorIcono: colorEstado,
-            onTap: () => _mostrarDetalleConPago(deuda),
+          final Color? colorBorde;
+          final Color? colorFondo;
+          switch (deuda.estado) {
+            case 'pagado':
+              colorBorde = ColorApp.colorExito;
+              colorFondo = ColorApp.colorExito.withValues(alpha: 0.08);
+            case 'pendiente':
+              colorBorde = ColorApp.colorAdvertencia;
+              colorFondo = ColorApp.colorAdvertencia.withValues(alpha: 0.08);
+            default:
+              colorBorde = null;
+              colorFondo = null;
+          }
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            decoration: BoxDecoration(
+              color: colorFondo,
+              borderRadius: BorderRadius.circular(12),
+              border: colorBorde != null
+                  ? Border.all(color: colorBorde, width: 1.5)
+                  : null,
+            ),
+            child: ItemLista(
+              titulo: 'Deuda #${deuda.id}',
+              subtitulo: _nombreCliente(deuda.clienteId),
+              detalle: '\$${deuda.saldo?.toStringAsFixed(0) ?? '0'}',
+              onTap: () => _mostrarDetalle(deuda),
+            ),
           );
         },
       ),

@@ -3,12 +3,12 @@ import * as repository from '../usuarios/usuarios.repository.js';
 
 export const crearNuevoUsuario = async (datos, rolUsuario) => {
 
+  console.log(`datos: ${datos}, rol ingresado ${rolUsuario}`)
+
   let rol_id = rolUsuario;
 
-  console.log("Datos recibidos en crearNuevoUsuario:", datos);
-  console.log("rolUsuario recibido en crearNuevoUsuario:", rolUsuario);
-
   if (rol_id !== 1) {
+    console.log("no estas como admin")
     rol_id = 2;
   }
 

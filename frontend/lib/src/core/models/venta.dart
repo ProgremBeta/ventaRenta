@@ -4,6 +4,7 @@ class Venta {
   final int? clienteId;
   final double total;
   final int? metodoPago;
+  final String? estado;
   final String? fechaCreacion;
 
   Venta({
@@ -12,16 +13,25 @@ class Venta {
     this.clienteId,
     required this.total,
     this.metodoPago,
+    this.estado,
     this.fechaCreacion,
   });
 
   factory Venta.fromJson(Map<String, dynamic> json) {
+    double _total(dynamic v) {
+      if (v == null) return 0.0;
+      if (v is num) return v.toDouble();
+      if (v is String) return double.tryParse(v) ?? 0.0;
+      return 0.0;
+    }
+
     return Venta(
       id: json['id'] as int,
       usuarioId: json['usuario_id'] as int?,
       clienteId: json['cliente_id'] as int?,
-      total: double.parse(json['total'].toString()),
+      total: _total(json['total']),
       metodoPago: json['metodo_pago'] as int?,
+      estado: json['estado'] as String?,
       fechaCreacion: json['fecha_creacion'] as String?,
     );
   }

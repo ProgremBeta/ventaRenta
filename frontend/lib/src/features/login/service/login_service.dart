@@ -23,12 +23,14 @@ class Autenticacion {
           'contrasena_hash': contrasena,
         },
       );
+      debugPrint("📡 [LoginService] POST /api/login → ${response.statusCode}");
+      debugPrint("📦 ${response.data}");
       final loginResponse = LoginResponse.fromJson(response.data);
       return LoginResult(exito: true, data: loginResponse);
 
     } on DioException catch (e) {
       final msg = e.response?.data?['mensaje'] as String? ?? 'Error al realizar la conexión';
-      debugPrint('Error login: $msg');
+      debugPrint("❌ [LoginService] → ${e.response?.statusCode} ${e.response?.data}");
       return LoginResult(exito: false, mensaje: msg);
     }
   }

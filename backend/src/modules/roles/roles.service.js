@@ -13,6 +13,7 @@ export const obtenerRolPorId = async (id) => {
 };
 
 export const crearRol = async (datos) => {
+
   const result = await repository.crearRol(datos);
 
   return result.rows;

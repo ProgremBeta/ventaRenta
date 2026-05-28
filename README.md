@@ -28,7 +28,6 @@ En necesario que tenga instalado Node JS https://nodejs.org/en y NPM, en windows
 
 En algunas distribuciones de linux se tiene que instalar el npm aparte, tendrian que buscarlo en su gestor de paquete he instalarlo, en mi caso uso arch entonces los comandos serian:
 
-
     sudo pacman -S nodejs
     sudo pacman -S npm
 
@@ -112,7 +111,7 @@ ahi estan las diferentes versiones de la base de datos
 
   * al intentar crear algunos valores a la base de datos no deja, por que se declaro cuando se creo la base de datos como valores en las tablas que dependen de otros valores de otras tablas o que estan limitados hasta cierta cantidad de caracteres. Entonces voy a cambiar en algunos valores de algunas tablas el limite de caracteres permitidos.
 
-  *entonces hay que tener en cuenta que cuando sale un valor null o salga con errores de "tipo de datos incorrectos" mayormente se debe a la cantidad de caracteres permitidos
+  * entonces hay que tener en cuenta que cuando sale un valor null o salga con errores de "tipo de datos incorrectos" mayormente se debe a la cantidad de caracteres permitidos
 
   * en el backend hay un archivo PruebasREST.http que la uso con la extension en visual studio code https://marketplace.visualstudio.com/items?itemName=humao.rest-client para hacer las pruebas rapidas.
 
