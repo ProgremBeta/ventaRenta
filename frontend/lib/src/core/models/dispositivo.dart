@@ -22,7 +22,7 @@ class Dispositivo {
       id: json['id'] as int,
       nombre: json['nombre'] as String?,
       categoriaId: json['categoria_id'] as int?,
-      precioHora: (json['precio_hora'] as num?)?.toDouble(),
+      precioHora: double.tryParse(json['precio_hora'].toString()),
       estado: json['estado'] as String?,
       activo: json['activo'] as bool?,
       fechaCreacion: json['fecha_creacion'] as String?,

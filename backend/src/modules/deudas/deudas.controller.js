@@ -6,7 +6,7 @@ export const obtenerDeudas = async (req, res, next) => {
 
         if (!result || result.length == 0) {
             console.log("no existen datos de deudas")
-            return res.status(404).json({ message: "no existen datos de deudas" });
+            return res.status(200).json({ message: "no existen datos de deudas" });
         }
         
         return res.status(200).json(result);
@@ -24,7 +24,7 @@ export const obtenerDeudaPorId = async (req, res, next) => {
 
         if (!result || result.length == 0) {
             console.log(`no se encontro deudas con el id: ${id}`)
-            return res.status(404).json({ message: `no se encontro deudas con el id: ${id}` });
+            return res.status(200).json({ message: `no se encontro deudas con el id: ${id}` });
         }
         
         return res.status(200).json(result);
@@ -74,7 +74,7 @@ export const eliminarDeuda = async (req, res, next) => {
 
         if (!result || result.length === 0) {
             console.log("no existe datos o ya fue eliminado")
-            return res.status(400).json({mensaje:"no existe datos o ya fue eliminado"})
+            return res.status(200).json({mensaje:"no existe datos o ya fue eliminado"})
         }
         
         return res.status(200).json(result);

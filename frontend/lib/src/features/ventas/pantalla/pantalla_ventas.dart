@@ -6,7 +6,7 @@ import 'package:frontend/src/core/models/venta.dart';
 import 'package:frontend/src/core/providers/auth_provider.dart';
 import 'package:frontend/src/core/themes/color_app.dart';
 import 'package:frontend/src/core/widgets/item_lista.dart';
-import 'package:frontend/src/core/widgets/toast_notificacion.dart';
+import 'package:frontend/src/core/widgets/global_notificacion.dart';
 import 'package:frontend/src/features/ventas/provider/ventas_provider.dart';
 
 class PantallaVentas extends StatefulWidget {
@@ -227,21 +227,13 @@ class _PantallaVentasState extends State<PantallaVentas> {
               colorBorde = null;
               colorFondo = null;
           }
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            decoration: BoxDecoration(
-              color: colorFondo,
-              borderRadius: BorderRadius.circular(12),
-              border: colorBorde != null
-                  ? Border.all(color: colorBorde, width: 1.5)
-                  : null,
-            ),
-            child: ItemLista(
-              titulo: 'Venta #${venta.id} — ${_nombreOperario(provider, venta.usuarioId)}',
-              subtitulo: '${_nombreCliente(provider, venta.clienteId)}  |  ${_nombreMetodoPago(provider, venta.metodoPago)}',
-              detalle: FormatoMoneda(venta.total),
-              onTap: () => _mostrarDetalle(venta),
-            ),
+          return ItemLista(
+            titulo: 'Venta #${venta.id} — ${_nombreOperario(provider, venta.usuarioId)}',
+            subtitulo: '${_nombreCliente(provider, venta.clienteId)}  |  ${_nombreMetodoPago(provider, venta.metodoPago)}',
+            detalle: FormatoMoneda(venta.total),
+            onTap: () => _mostrarDetalle(venta),
+            colorFondo: colorFondo,
+            colorBorde: colorBorde,
           );
         },
       ),
@@ -394,22 +386,24 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
 
             if (detallesValidos.isEmpty) {
               setState(() => _enviando = false);
-              ToastNotificacion.mostrar(context, mensaje: 'Agrega al menos un producto', tipo: TipoToast.error);
+              GlobalNotificacion.error('Agrega al menos un producto');
               return;
             }
 
-            final ventaCreada = await context.read<VentasProvider>().crearVenta({
-              'usuario_id': auth.userRolId ?? 1,
+            final ventaData = <String, dynamic>{
+              'usuario_id': auth.userId ?? 1,
               'metodo_pago': _metodoPago,
               if (_clienteId != null) 'cliente_id': _clienteId,
               'detalles': detallesValidos,
-            });
+            };
+            debugPrint("📡 [VentaForm] data a enviar: $ventaData");
+            final ventaCreada = await context.read<VentasProvider>().crearVenta(ventaData);
 
             if (!mounted) return;
 
             if (ventaCreada == null) {
               Navigator.pop(context);
-              ToastNotificacion.mostrar(context, mensaje: 'Error al crear venta', tipo: TipoToast.error);
+              GlobalNotificacion.error('Error al crear venta');
               return;
             }
 
@@ -421,7 +415,7 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
               });
             } else {
               Navigator.pop(context);
-              ToastNotificacion.mostrar(context, mensaje: 'Venta creada con éxito', tipo: TipoToast.exito);
+              GlobalNotificacion.exito('Venta creada con éxito');
             }
           },
           icon: const Icon(Icons.check, color: Colors.white, size: 18),
@@ -478,10 +472,9 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
             });
             if (!mounted) return;
             Navigator.pop(context);
-            ToastNotificacion.mostrar(
-              context,
+            GlobalNotificacion.mostrar(
               mensaje: exito ? 'Venta creada con deuda' : 'Venta creada, error al crear deuda',
-              tipo: exito ? TipoToast.exito : TipoToast.advertencia,
+              color: exito ? ColorApp.colorExito : ColorApp.colorAdvertencia,
             );
           },
           icon: const Icon(Icons.account_balance, color: Colors.white, size: 18),

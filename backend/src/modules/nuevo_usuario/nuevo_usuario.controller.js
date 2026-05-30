@@ -9,16 +9,20 @@ export const crearNuevoUsuario = async (req, res, next) => {
 
   if(req.usuarioLogeado == null){
 
-    const primerUsusario = await obtenerUsuarios();
+      const roles = await obtenerRoles();
 
-    if (primerUsusario[0].nombre === "ad") {
+    if (!roles || roles.length === 0) {
+      const rolAdmin = {"nombre": "administrador"}
+      const rolOperador = {"nombre": "operador"}
 
-      const datos = {"nombre": "administrador"}
+      await crearRol(rolAdmin);      
+      await crearRol(rolOperador);      
+    }
 
-      await crearRol(datos);
+    const existe = await obtenerUsuarios()
 
-      rolUsuario = obtenerRoles()[0].rol_id
-      console.log("el rol nuevo es:", rolUsuario)
+    if (!existe || existe.length === 0) {
+      rolUsuario = 1
     }else{
       rolUsuario = 2
     }
@@ -27,7 +31,7 @@ export const crearNuevoUsuario = async (req, res, next) => {
     rolUsuario = req.usuarioLogeado?.rol_id;
   }
 
-  console.log("el rol del usuario es: ", rolUsuario)
+  console.log("este es el rol_id para el usuario", rolUsuario)
     
   try {
     let result;
@@ -35,7 +39,7 @@ export const crearNuevoUsuario = async (req, res, next) => {
     if (rolUsuario == null){
       result = await service.crearNuevoUsuario(datos);
     }else{
-      result = await service.crearNuevoUsuario(datos, rolUsuario);
+      result = await service.crearNuevoUsuario(rolUsuario,datos);
     }
 
     if (!datos.nombre) {

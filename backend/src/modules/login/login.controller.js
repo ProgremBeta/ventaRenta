@@ -6,6 +6,7 @@ export const hacerLogin = async (req, res, next) => {
     const result = await loginService.hacerLogin(datos)
     if (result.permitirAcceso === true) {
       res.status(200).json({
+        id: result.usuario.id,
         mensaje: "login",
         token: result.token.token,
         rol_id: result.usuario.rol_id,

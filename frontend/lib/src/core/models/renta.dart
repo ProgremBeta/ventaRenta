@@ -37,10 +37,10 @@ class Renta {
       clienteId: json['cliente_id'] as int?,
       fechaInicio: json['fecha_inicio'] as String?,
       fechaFin: json['fecha_fin'] as String?,
-      tiempoTotal: json['tiempo_total'] as String?,
+      tiempoTotal: json['tiempo_total']?.toString(),
       precioTotal: _parseNum(json['precio_total']),
       metodoPago: json['metodo_pago'] as int?,
-      estado: json['estado'] as String?,
+      estado: (json['estado'] as String?)?.toLowerCase(),
       fechaCreacion: json['fecha_creacion'] as String?,
     );
   }

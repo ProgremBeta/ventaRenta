@@ -2,10 +2,6 @@ import * as repository from './deudas.repository.js';
 
 export const obtenerDeudas = async () => {
     const result = await repository.obtenerDeudas();
-    console.log("en services deudas: ", result.rows);
-
-    console.log(result);
-
     return result.rows;
 }
 

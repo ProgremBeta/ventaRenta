@@ -6,7 +6,7 @@ export const obtenerClientes = async (req, res, next) => {
         
         if (!result || result.length === 0) {
             console.log("No se encontraron clientes")
-            res.status(200).json({ message: "No se encontraron clientes" });
+            res.status(404).json({ message: "No se encontraron clientes" });
         }
 
         res.status(200).json(result);

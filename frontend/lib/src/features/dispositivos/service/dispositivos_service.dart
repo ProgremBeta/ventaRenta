@@ -11,8 +11,8 @@ class DispositivosService {
       debugPrint("📡 [DispositivosService] POST /api/dispositivos → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       return true;
-    } on DioException catch (e) {
-      debugPrint("❌ [DispositivosService] POST /api/dispositivos → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [DispositivosService] POST /api/dispositivos → $e");
       return false;
     }
   }

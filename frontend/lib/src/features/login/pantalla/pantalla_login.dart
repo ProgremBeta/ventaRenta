@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:frontend/src/core/providers/auth_provider.dart';
 import 'package:frontend/src/core/themes/color_app.dart';
 import 'package:frontend/src/core/themes/estilos_app.dart';
-import 'package:frontend/src/core/widgets/toast_notificacion.dart';
+import 'package:frontend/src/core/widgets/global_notificacion.dart';
 import 'package:frontend/src/features/usuarios/service/usuarios_service.dart';
 import 'package:go_router/go_router.dart';
 
@@ -36,11 +36,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
     if (exito) {
       context.go('/inicio');
     } else {
-      ToastNotificacion.mostrar(
-        context,
-        mensaje: auth.error ?? 'Error al iniciar sesión',
-        tipo: TipoToast.error,
-      );
+      GlobalNotificacion.error(auth.error ?? 'Error al iniciar sesión');
     }
   }
 
@@ -60,21 +56,13 @@ class _PantallaLoginState extends State<PantallaLogin> {
     if (!mounted) return;
 
     if (exito) {
-      ToastNotificacion.mostrar(
-        context,
-        mensaje: 'Usuario registrado con éxito',
-        tipo: TipoToast.exito,
-      );
+      GlobalNotificacion.exito('Usuario registrado con éxito');
       setState(() {
         _esRegistro = false;
         _contrasenaController.text = _passRegCtrl.text;
       });
     } else {
-      ToastNotificacion.mostrar(
-        context,
-        mensaje: 'Error al registrar usuario',
-        tipo: TipoToast.error,
-      );
+      GlobalNotificacion.error('Error al registrar usuario');
     }
   }
 
@@ -151,7 +139,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
                     TextField(
                       controller: _esRegistro ? _passRegCtrl : _contrasenaController,
                       obscureText: true,
-                      decoration: _inputDeco(_esRegistro ? 'Contraseña' : 'Contraseña'),
+                      decoration: _inputDeco('Contraseña'),
                       style: const TextStyle(color: ColorApp.colorTexto),
                     ),
                     const SizedBox(height: 24),

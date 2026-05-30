@@ -1,100 +1,54 @@
-import * as rentaRepository from './../../modules/rentas/rentas.repository.js';
-import * as detalleRentaRepository from './../../modules/detalles_rentas/detalles_rentas.repository.js';
-import * as clienteRepository from './../../modules/clientes/clientes.repository.js';
-import * as dispositivoRepository from './../../modules/dispositivos/dispositivos.repository.js';
+import * as rentaService from './../../modules/rentas/rentas.service.js';
+import * as detalleRentaService from './../../modules/detalles_rentas/detalles_rentas.service.js';
+import * as clienteService from './../../modules/clientes/clientes.service.js';
+import * as dispositivoService from './../../modules/dispositivos/dispositivos.service.js';
 
-export const iniciarRentaDispositivos = async (data) => {
-  const clienteId = data.cliente_id;
-  const usuarioId = data.usuario_id;
-  const fechaInicio = data.fecha_inicio;
-  const fechaFin = data.fecha_fin;
-  const metodoPago = data.metodo_pago;
-  const dispositivos = data.dispositivos;
+export const iniciarRentaDispositivos = async (datos) => {
 
-  // Validaciones básicas
-  if (!clienteId) {
-    throw new Error("no se ingresó cliente_id");
+  const cliente = await clienteService.obtenerClientePorId(datos.cliente_id);
+
+  console.log("clientes en iniciar renta services: ", cliente)
+
+  const dispositivo = await dispositivoService.obtenerDispositivoPorId(datos.dispositivo_id)
+
+  if (!dispositivo[0]) {
+    throw new Error(`dispostivo con id ${datos.dispositivo_id} no encontrado`);
   }
+  
+  const inicio = new Date();
+  
+  const milisegundos = datos.duracion * 60 * 60 * 1000;
 
-  if (!usuarioId) {
-    throw new Error("no se ingresó usuario_id");
-  }
+  const fin = new Date(inicio.getTime() + milisegundos);
 
-  if (!fechaInicio || !fechaFin) {
-    throw new Error("no se ingresaron fecha_inicio y fecha_fin");
-  }
+  console.log("dispositivo: ", dispositivo, " precio total: ", dispositivo[0].precio_hora)
 
-  if (!metodoPago) {
-    throw new Error("no se ingresó metodo_pago");
-  }
+  const precioTotal = dispositivo[0].precio_hora * datos.duracion;
 
-  //valida que si existan dispositivos para inciar la renta
-  if (!dispositivos || dispositivos.length === 0) {
-    throw new Error("no se ingresaron dispositivos");
-  }
-
-  // Validar que el cliente existe
-  const cliente = await clienteRepository.obtenerClientePorId(clienteId);
-  if (!cliente.rows[0]) {
-    throw new Error(`Cliente con id ${clienteId} no encontrado`);
-  }
-
-  // Validar que todos los dispositivos existen y calcular precio total
-  let precioTotal = 0;
-  const dispositivosConDatos = []; // Guardar datos completos de dispositivos
-  const inicio = new Date(fechaInicio);
-  const fin = new Date(fechaFin);
-  const horasRenta = (fin - inicio) / (1000 * 60 * 60); // Calcular horas
-
-  // se asegura que la que las fechas estan ingresadas correctamente
-  if (horasRenta <= 0) {
+  if (datos.duracion <= 0) {
     throw new Error("fecha_fin debe ser mayor que fecha_inicio");
   }
 
-  //consulta que exista el dispositivo y agrega los dispositivos a la lista
-  for (const dispositivo of dispositivos) {
-    const dispoExistente = await dispositivoRepository.obtenerDispositivoPorId(dispositivo.dispositivo_id);
-    if (!dispoExistente.rows[0]) {
-      throw new Error(`Dispositivo con id ${dispositivo.dispositivo_id} no encontrado`);
-    }
-    //agrega los dispositivos a la lista
-    dispositivosConDatos.push(dispoExistente.rows[0]);
-    precioTotal += dispositivo.precio_hora * horasRenta;
-  }
-
-  // Crear la renta
   const datosRenta = {
-    cliente_id: clienteId,
-    usuario_id: usuarioId,
-    fecha_inicio: fechaInicio,
-    fecha_fin: fechaFin,
-    tiempo_total: `${Math.round(horasRenta)} horas`,
-    metodo_pago: metodoPago,
-    estado: 'activa',
-    precio_total: precioTotal
+    cliente_id: datos.cliente_id,
+    usuario_id: datos.usuario_id,
+    fecha_inicio: inicio,
+    fecha_fin: fin,
+    tiempo_total: datos.duracion,
+    metodo_pago: datos.metodo_pago,
+    precio_total: precioTotal,
+    estado: "renta"
   };
 
-  const renta = await rentaRepository.crearRenta(datosRenta);
-  const rentaId = renta.rows[0].id;
+  const renta = await rentaService.crearRenta(datosRenta);
+  
+  await detalleRentaService.crearRenta({
+    renta_id: renta[0].id,
+    dispositivo_id:dispositivo[0].id,
+    precio_hora:dispositivo[0].precio_hora,
+    tiempo_total:renta[0].tiempo_total,
+    sub_total:renta[0].precio_total
+  });
 
-  // Crear detalles de renta_dispositivos y actualizar estado
-  for (let i = 0; i < dispositivos.length; i++) {
-    const dispositivoId = dispositivos[i].dispositivo_id;
-    const datoDispositivo = dispositivosConDatos[i];
-
-    await detalleRentaRepository.crearRentaDispositivo({
-      renta_id: rentaId,
-      dispositivo_id: dispositivoId
-    });
-
-    // Actualizar estado del dispositivo a "en renta"
-    await dispositivoRepository.actualizarDispositivo(dispositivoId, {
-      nombre: datoDispositivo.nombre,
-      categoria_id: datoDispositivo.categoria_id,
-      estado: 'en renta'
-    });
-  }
-
-  console.log(`Renta ${rentaId} creada exitosamente con ${dispositivos.length} dispositivos`);
   return renta;
 }

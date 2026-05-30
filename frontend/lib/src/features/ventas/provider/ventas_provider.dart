@@ -35,6 +35,7 @@ class VentasProvider extends ChangeNotifier {
     notifyListeners();
 
     _ventas = await _service.ventas();
+    _ventas.sort((a, b) => (b.fechaCreacion ?? '').compareTo(a.fechaCreacion ?? ''));
 
     _isLoading = false;
     notifyListeners();

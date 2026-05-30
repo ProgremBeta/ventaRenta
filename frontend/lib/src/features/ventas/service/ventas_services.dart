@@ -17,8 +17,8 @@ class VentaServices {
       debugPrint("📦 ${response.data}");
       final List<dynamic> data = response.data;
       return data.map((json) => Venta.fromJson(json)).toList();
-    } on DioException catch (e) {
-      debugPrint("❌ [VentaServices] GET /api/ventas → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [VentaServices] GET /api/ventas → $e");
       return [];
     }
   }
@@ -28,22 +28,29 @@ class VentaServices {
       final response = await _dio.post('/api/nueva_venta', data: data);
       debugPrint("📡 [VentaServices] POST /api/nueva_venta → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
-      return Venta.fromJson(response.data);
-    } on DioException catch (e) {
-      debugPrint("❌ [VentaServices] POST /api/nueva_venta → ${e.response?.statusCode} ${e.response?.data}");
+      final resp = response.data;
+      if (resp is List && resp.isNotEmpty) {
+        return Venta.fromJson(resp[0] as Map<String, dynamic>);
+      }
+      if (resp is Map<String, dynamic>) {
+        return Venta.fromJson(resp);
+      }
+      return null;
+    } catch (e) {
+      debugPrint("❌ [VentaServices] POST /api/nueva_venta → $e");
       return null;
     }
   }
 
   Future<List<DetalleVenta>> detalleVenta(int ventaId) async {
     try {
-      final response = await _dio.get('/api/detalle_venta/$ventaId');
-      debugPrint("📡 [VentaServices] GET /api/detalle_venta/$ventaId → ${response.statusCode}");
+      final response = await _dio.get('/api/detalles_ventas/$ventaId');
+      debugPrint("📡 [VentaServices] GET /api/detalles_ventas/$ventaId → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       final List<dynamic> data = response.data;
       return data.map((json) => DetalleVenta.fromJson(json)).toList();
-    } on DioException catch (e) {
-      debugPrint("❌ [VentaServices] GET /api/detalle_venta/$ventaId → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [VentaServices] GET /api/detalles_ventas/$ventaId → $e");
       return [];
     }
   }
@@ -55,8 +62,8 @@ class VentaServices {
       debugPrint("📦 ${response.data}");
       final List<dynamic> data = response.data;
       return data.map((json) => Cliente.fromJson(json)).toList();
-    } on DioException catch (e) {
-      debugPrint("❌ [VentaServices] GET /api/clientes → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [VentaServices] GET /api/clientes → $e");
       return [];
     }
   }
@@ -68,8 +75,8 @@ class VentaServices {
       debugPrint("📦 ${response.data}");
       final List<dynamic> data = response.data;
       return data.map((json) => Producto.fromJson(json)).toList();
-    } on DioException catch (e) {
-      debugPrint("❌ [VentaServices] GET /api/productos → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [VentaServices] GET /api/productos → ${e}");
       return [];
     }
   }
@@ -81,8 +88,8 @@ class VentaServices {
       debugPrint("📦 ${response.data}");
       final List<dynamic> data = response.data;
       return data.map((json) => MetodosPagos.fromJson(json)).toList();
-    } on DioException catch (e) {
-      debugPrint("❌ [VentaServices] GET /api/metodos_pagos → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [VentaServices] GET /api/metodos_pagos → ${e}");
       return [];
     }
   }
@@ -93,8 +100,8 @@ class VentaServices {
       debugPrint("📡 [VentaServices] POST /api/metodos_pagos → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       return true;
-    } on DioException catch (e) {
-      debugPrint("❌ [VentaServices] POST /api/metodos_pagos → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [VentaServices] POST /api/metodos_pagos → ${e}");
       return false;
     }
   }
@@ -105,8 +112,8 @@ class VentaServices {
       debugPrint("📡 [VentaServices] PUT /api/metodos_pagos/$id → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       return true;
-    } on DioException catch (e) {
-      debugPrint("❌ [VentaServices] PUT /api/metodos_pagos/$id → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [VentaServices] PUT /api/metodos_pagos/$id → ${e}");
       return false;
     }
   }
@@ -117,8 +124,8 @@ class VentaServices {
       debugPrint("📡 [VentaServices] POST /api/nueva_deuda → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       return true;
-    } on DioException catch (e) {
-      debugPrint("❌ [VentaServices] POST /api/nueva_deuda → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [VentaServices] POST /api/nueva_deuda → ${e}");
       return false;
     }
   }

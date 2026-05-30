@@ -13,22 +13,32 @@ class DeudasService {
       final response = await _dio.get('/api/deudas');
       debugPrint("📡 [DeudasService] GET /api/deudas → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
-      final List<dynamic> data = response.data;
-      return data.map((json) => Deuda.fromJson(json)).toList();
-    } catch (err) {
-      debugPrint("❌ [DeudasService] GET /api/deudas → $err");
+      final data = response.data;
+      if (data is List) {
+        return data.map((json) => Deuda.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      debugPrint("❌ [DeudasService] GET /api/deudas → $e");
       return [];
     }
   }
 
   Future<Deuda?> crearDeuda(Map<String, dynamic> data) async {
     try {
-      final response = await _dio.post('/api/crear_deuda', data: data);
-      debugPrint("📡 [DeudasService] POST /api/crear_deuda → ${response.statusCode}");
+      final response = await _dio.post('/api/nueva_deuda', data: data);
+      debugPrint("📡 [DeudasService] POST /api/nueva_deuda → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
-      return Deuda.fromJson(response.data);
-    } on DioException catch (e) {
-      debugPrint("❌ [DeudasService] POST /api/crear_deuda → ${e.response?.statusCode} ${e.response?.data}");
+      final resp = response.data;
+      if (resp is List && resp.isNotEmpty) {
+        return Deuda.fromJson(resp[0] as Map<String, dynamic>);
+      }
+      if (resp is Map<String, dynamic>) {
+        return Deuda.fromJson(resp);
+      }
+      return null;
+    } catch (e) {
+      debugPrint("❌ [DeudasService] POST /api/nueva_deuda → $e");
       return null;
     }
   }
@@ -38,9 +48,16 @@ class DeudasService {
       final response = await _dio.post('/api/pago_deuda', data: data);
       debugPrint("📡 [DeudasService] POST /api/pago_deuda → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
-      return response.data as Map<String, dynamic>;
-    } on DioException catch (e) {
-      debugPrint("❌ [DeudasService] POST /api/pago_deuda → ${e.response?.statusCode} ${e.response?.data}");
+      final resp = response.data;
+      if (resp is Map<String, dynamic>) {
+        return resp;
+      }
+      if (resp is List && resp.isNotEmpty) {
+        return resp[0] as Map<String, dynamic>;
+      }
+      return null;
+    } catch (e) {
+      debugPrint("❌ [DeudasService] POST /api/pago_deuda → $e");
       return null;
     }
   }
@@ -49,10 +66,13 @@ class DeudasService {
     try {
       final response = await _dio.get('/api/clientes');
       debugPrint("📡 [DeudasService] GET /api/clientes → ${response.statusCode}");
-      final List<dynamic> data = response.data;
-      return data.map((json) => Cliente.fromJson(json)).toList();
-    } on DioException catch (e) {
-      debugPrint("❌ [DeudasService] GET /api/clientes → ${e.response?.statusCode} ${e.response?.data}");
+      final data = response.data;
+      if (data is List) {
+        return data.map((json) => Cliente.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      debugPrint("❌ [DeudasService] GET /api/clientes → $e");
       return [];
     }
   }
@@ -61,13 +81,16 @@ class DeudasService {
     try {
       final response = await _dio.get('/api/pagos_deudas');
       debugPrint("📡 [DeudasService] GET /api/pagos_deudas → ${response.statusCode}");
-      final List<dynamic> data = response.data;
-      return data
-          .map((json) => PagoDeuda.fromJson(json))
-          .where((p) => p.deudaId == deudaId)
-          .toList();
-    } on DioException catch (e) {
-      debugPrint("❌ [DeudasService] GET /api/pagos_deudas → ${e.response?.statusCode} ${e.response?.data}");
+      final data = response.data;
+      if (data is List) {
+        return data
+            .map((json) => PagoDeuda.fromJson(json))
+            .where((p) => p.deudaId == deudaId)
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      debugPrint("❌ [DeudasService] GET /api/pagos_deudas → $e");
       return [];
     }
   }

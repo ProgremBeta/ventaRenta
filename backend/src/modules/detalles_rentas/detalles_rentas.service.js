@@ -10,7 +10,10 @@ export const obtenerRentaPorId = async (id) => {
 	return result.rows;
 }
 
-export const crearRenta = async (datos) => {
+export const  crearRenta = async (datos) => {
+
+	console.log("datos para crear renta: ", datos)
+
 	const result = await repository.crearRenta(datos);
 	return result.rows;
 }

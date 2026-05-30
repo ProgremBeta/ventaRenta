@@ -10,10 +10,13 @@ class UsuariosService {
       final response = await _dio.get('/api/usuarios');
       debugPrint("📡 [UsuariosService] GET /api/usuarios → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
-      final List<dynamic> data = response.data;
-      return data.cast<Map<String, dynamic>>();
-    } on DioException catch (e) {
-      debugPrint("❌ [UsuariosService] GET /api/usuarios → ${e.response?.statusCode} ${e.response?.data}");
+      final data = response.data;
+      if (data is List) {
+        return data.cast<Map<String, dynamic>>();
+      }
+      return [];
+    } catch (e) {
+      debugPrint("❌ [UsuariosService] GET /api/usuarios → $e");
       return [];
     }
   }
@@ -23,9 +26,16 @@ class UsuariosService {
       final response = await _dio.get('/api/usuarios/$id');
       debugPrint("📡 [UsuariosService] GET /api/usuarios/$id → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
-      return response.data as Map<String, dynamic>;
-    } on DioException catch (e) {
-      debugPrint("❌ [UsuariosService] GET /api/usuarios/$id → ${e.response?.statusCode} ${e.response?.data}");
+      final resp = response.data;
+      if (resp is Map<String, dynamic>) {
+        return resp;
+      }
+      if (resp is List && resp.isNotEmpty) {
+        return resp[0] as Map<String, dynamic>;
+      }
+      return null;
+    } catch (e) {
+      debugPrint("❌ [UsuariosService] GET /api/usuarios/$id → $e");
       return null;
     }
   }
@@ -40,8 +50,8 @@ class UsuariosService {
         return data.cast<Map<String, dynamic>>();
       }
       return [];
-    } on DioException catch (e) {
-      debugPrint("❌ [UsuariosService] GET /api/roles → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [UsuariosService] GET /api/roles → $e");
       return [];
     }
   }
@@ -52,8 +62,8 @@ class UsuariosService {
       debugPrint("📡 [UsuariosService] POST /api/roles → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       return true;
-    } on DioException catch (e) {
-      debugPrint("❌ [UsuariosService] POST /api/roles → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [UsuariosService] POST /api/roles → $e");
       return false;
     }
   }
@@ -64,8 +74,8 @@ class UsuariosService {
       debugPrint("📡 [UsuariosService] PUT /api/roles/$id → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       return true;
-    } on DioException catch (e) {
-      debugPrint("❌ [UsuariosService] PUT /api/roles/$id → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [UsuariosService] PUT /api/roles/$id → $e");
       return false;
     }
   }
@@ -73,11 +83,11 @@ class UsuariosService {
   Future<bool> crearUsuario(Map<String, dynamic> data) async {
     try {
       final response = await _dio.post('/api/nuevo_usuario', data: data);
-      debugPrint("📡 [UsuariosService] POST /api/usuarios → ${response.statusCode}");
+      debugPrint("📡 [UsuariosService] POST /api/nuevo_usuario → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       return true;
-    } on DioException catch (e) {
-      debugPrint("❌ [UsuariosService] POST /api/usuarios → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [UsuariosService] POST /api/nuevo_usuario → $e");
       return false;
     }
   }
@@ -88,8 +98,8 @@ class UsuariosService {
       debugPrint("📡 [UsuariosService] PUT /api/usuarios/$id → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       return true;
-    } on DioException catch (e) {
-      debugPrint("❌ [UsuariosService] PUT /api/usuarios/$id → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [UsuariosService] PUT /api/usuarios/$id → $e");
       return false;
     }
   }

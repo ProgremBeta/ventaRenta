@@ -32,6 +32,9 @@ class Autenticacion {
       final msg = e.response?.data?['mensaje'] as String? ?? 'Error al realizar la conexión';
       debugPrint("❌ [LoginService] → ${e.response?.statusCode} ${e.response?.data}");
       return LoginResult(exito: false, mensaje: msg);
+    } catch (e) {
+      debugPrint("❌ [LoginService] → $e");
+      return LoginResult(exito: false, mensaje: 'Error inesperado');
     }
   }
 }

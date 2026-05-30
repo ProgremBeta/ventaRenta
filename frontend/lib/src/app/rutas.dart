@@ -6,6 +6,7 @@ import 'package:frontend/src/features/perfil/pantalla/pantalla_perfil.dart';
 import 'package:frontend/src/features/ventas/pantalla/pantalla_ventas.dart';
 import 'package:frontend/src/features/rentas/pantalla/pantalla_rentas.dart';
 import 'package:frontend/src/features/deudas/pantalla/pantalla_deudas.dart';
+import 'package:frontend/src/features/inventario/pantalla/pantalla_inventario.dart';
 
 import 'package:frontend/src/app/navegacion_barra.dart';
 
@@ -23,6 +24,7 @@ GoRouter Rutas = GoRouter(
         GoRoute(path: '/ventas', builder: (context, state) => const PantallaVentas()),
         GoRoute(path: '/rentas', builder: (context, state) => const PantallaRentas()),
         GoRoute(path: '/deudas', builder: (context, state) => const PantallaDeudas()),
+        GoRoute(path: '/inventario', builder: (context, state) => const PantallaInventario()),
       ],
     ),
   ],

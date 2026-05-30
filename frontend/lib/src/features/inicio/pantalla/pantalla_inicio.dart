@@ -4,12 +4,13 @@ import 'package:provider/provider.dart';
 import 'package:frontend/src/core/providers/auth_provider.dart';
 import 'package:frontend/src/core/themes/color_app.dart';
 import 'package:frontend/src/core/themes/estilos_app.dart';
-import 'package:frontend/src/core/widgets/toast_notificacion.dart';
+import 'package:frontend/src/core/widgets/global_notificacion.dart';
 import 'package:frontend/src/features/deudas/provider/deudas_provider.dart';
 import 'package:frontend/src/features/ventas/provider/ventas_provider.dart';
 import 'package:frontend/src/features/rentas/provider/rentas_provider.dart';
 import 'package:frontend/src/features/categorias/service/categorias_service.dart';
 import 'package:frontend/src/features/productos/service/productos_service.dart';
+import 'package:frontend/src/features/clientes/service/clientes_service.dart';
 import 'package:frontend/src/features/dispositivos/service/dispositivos_service.dart';
 
 class PantallaInicio extends StatefulWidget {
@@ -38,9 +39,9 @@ class _PantallaInicioState extends State<PantallaInicio> {
     final deudas = context.watch<DeudasProvider>();
 
     final totalVentas = ventas.ventas.fold<double>(0, (sum, v) => sum + v.total);
-    final rentasActivas = rentas.rentas.where((r) => r.estado == 'activa').length;
-    final deudasPendientes = deudas.deudas.where((d) => d.estado != 'pagado').length;
-    final totalDeudas = deudas.deudas.fold<double>(0, (sum, d) => sum + (d.saldo ?? 0));
+    final rentasActivas = rentas.rentas.where((r) => r.estado == 'renta').length;
+    final deudasPendientes = deudas.deudas.where((d) => d.estado != 'pagado' && d.estado != 'pago').length;
+    final totalDeudas = deudas.deudas.where((d) => d.estado != 'pagado' && d.estado != 'pago').fold<double>(0, (sum, d) => sum + (d.saldo ?? 0));
 
     return Scaffold(
       backgroundColor: ColorApp.colorPrincipal,
@@ -100,15 +101,21 @@ class _PantallaInicioState extends State<PantallaInicio> {
                   ),
                   const SizedBox(height: 12),
                   _botonAdmin(
-                    label: 'Inventario',
-                    icono: Icons.inventory,
-                    onTap: () => _mostrarInventario(context),
-                  ),
-                  const SizedBox(height: 12),
-                  _botonAdmin(
                     label: 'Nuevo dispositivo',
                     icono: Icons.devices_other,
                     onTap: () => _mostrarNuevoDispositivo(context),
+                  ),
+                  const SizedBox(height: 12),
+                  _botonAdmin(
+                    label: 'Nuevo cliente',
+                    icono: Icons.person_add,
+                    onTap: () => _mostrarNuevoCliente(context),
+                  ),
+                  const SizedBox(height: 12),
+                  _botonAdmin(
+                    label: 'Inventario',
+                    icono: Icons.inventory,
+                    onTap: () => context.go('/inventario'),
                   ),
                 ],
               ),
@@ -244,10 +251,9 @@ class _PantallaInicioState extends State<PantallaInicio> {
                             : await service.crearCategoriaDispositivo(body);
                         if (!ctx.mounted) return;
                         Navigator.pop(ctx);
-                        ToastNotificacion.mostrar(
-                          context,
+                        GlobalNotificacion.mostrar(
                           mensaje: exito ? 'Categoría creada' : 'Error al crear categoría',
-                          tipo: exito ? TipoToast.exito : TipoToast.error,
+                          color: exito ? ColorApp.colorExito : ColorApp.colorError,
                         );
                       },
                       icon: const Icon(Icons.save, color: Colors.white, size: 18),
@@ -361,177 +367,13 @@ class _PantallaInicioState extends State<PantallaInicio> {
                   });
                   if (!ctx.mounted) return;
                   Navigator.pop(ctx);
-                  ToastNotificacion.mostrar(
-                    context,
+                  GlobalNotificacion.mostrar(
                     mensaje: exito ? 'Producto creado' : 'Error al crear producto',
-                    tipo: exito ? TipoToast.exito : TipoToast.error,
+                    color: exito ? ColorApp.colorExito : ColorApp.colorError,
                   );
                 },
                 icon: const Icon(Icons.save, color: Colors.white, size: 18),
                 label: Text(enviando ? '' : 'Crear'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorApp.colorAcento, foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), elevation: 0,
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  void _mostrarInventario(BuildContext context) {
-    final service = ProductosService();
-
-    service.productos().then((productos) {
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            backgroundColor: ColorApp.colorSegundario,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: const Text('Inventario', style: TextStyle(color: ColorApp.colorTitulo)),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: productos.isEmpty
-                  ? const Text('No hay productos', style: TextStyle(color: ColorApp.colorTextoMuted))
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: productos.length,
-                      itemBuilder: (context, index) {
-                        final p = productos[index];
-                        final id = p['id'] as int? ?? 0;
-                        final nombre = p['nombre'] as String? ?? 'Producto #$id';
-                        final precio = p['precio'];
-                        final activo = p['activo'] as bool? ?? true;
-                        final stock = p['stock'] as int?;
-                        final stockMinimo = p['stock_minimo'] as int?;
-
-                        return Card(
-                          color: ColorApp.colorElevado,
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(nombre,
-                                          style: const TextStyle(color: ColorApp.colorTexto, fontWeight: FontWeight.w600)),
-                                    ),
-                                    if (!activo)
-                                      const Text('INACTIVO',
-                                          style: TextStyle(color: ColorApp.colorError, fontSize: 12)),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Text('\$${precio?.toString() ?? '0'}',
-                                    style: const TextStyle(color: ColorApp.colorSubTitulo)),
-                                const SizedBox(height: 4),
-                                Text('Stock: ${stock ?? 0}  |  Mínimo: ${stockMinimo ?? 0}',
-                                    style: TextStyle(
-                                      color: (stock != null && stockMinimo != null && stock < stockMinimo)
-                                          ? ColorApp.colorError
-                                          : ColorApp.colorSubTitulo,
-                                      fontSize: 13,
-                                    )),
-                                const SizedBox(height: 8),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    TextButton.icon(
-                                      onPressed: () => _mostrarActualizarStock(context, id, nombre, stock ?? 0),
-                                      icon: const Icon(Icons.edit, size: 16, color: ColorApp.colorAcento),
-                                      label: const Text('Stock', style: TextStyle(color: ColorApp.colorAcento, fontSize: 13)),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Cerrar', style: TextStyle(color: ColorApp.colorAcento)),
-              ),
-            ],
-          ),
-        );
-      }
-    });
-  }
-
-  void _mostrarActualizarStock(BuildContext context, int id, String nombre, int stockActual) {
-    final stockCtrl = TextEditingController(text: stockActual.toString());
-    final minCtrl = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-    final service = ProductosService();
-
-    bool enviando = false;
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            backgroundColor: ColorApp.colorSegundario,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Text('Actualizar stock: $nombre', style: const TextStyle(color: ColorApp.colorTitulo)),
-            content: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: stockCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: _inputDeco('Stock actual'),
-                    style: const TextStyle(color: ColorApp.colorTexto),
-                    validator: (v) => v == null || v.isEmpty ? 'Requerido' : null,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: minCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: _inputDeco('Stock mínimo (opcional)'),
-                    style: const TextStyle(color: ColorApp.colorTexto),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Cancelar', style: TextStyle(color: ColorApp.colorTextoMuted)),
-              ),
-              ElevatedButton.icon(
-                onPressed: enviando ? null : () async {
-                  if (!formKey.currentState!.validate()) return;
-                  setState(() => enviando = true);
-                  final data = <String, dynamic>{
-                    'stock': int.tryParse(stockCtrl.text) ?? 0,
-                  };
-                  if (minCtrl.text.isNotEmpty) {
-                    data['stock_minimo'] = int.tryParse(minCtrl.text);
-                  }
-                  final exito = await service.actualizarProducto(id, data);
-                  if (!ctx.mounted) return;
-                  Navigator.pop(ctx);
-                  if (exito) {
-                    ToastNotificacion.mostrar(context, mensaje: 'Stock actualizado', tipo: TipoToast.exito);
-                  } else {
-                    ToastNotificacion.mostrar(context, mensaje: 'Error al actualizar stock', tipo: TipoToast.error);
-                  }
-                },
-                icon: const Icon(Icons.save, color: Colors.white, size: 18),
-                label: Text(enviando ? '' : 'Guardar'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ColorApp.colorAcento, foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), elevation: 0,
@@ -617,10 +459,89 @@ class _PantallaInicioState extends State<PantallaInicio> {
                   });
                   if (!ctx.mounted) return;
                   Navigator.pop(ctx);
-                  ToastNotificacion.mostrar(
-                    context,
+                  GlobalNotificacion.mostrar(
                     mensaje: exito ? 'Dispositivo creado' : 'Error al crear dispositivo',
-                    tipo: exito ? TipoToast.exito : TipoToast.error,
+                    color: exito ? ColorApp.colorExito : ColorApp.colorError,
+                  );
+                },
+                icon: const Icon(Icons.save, color: Colors.white, size: 18),
+                label: Text(enviando ? '' : 'Crear'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorApp.colorAcento, foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), elevation: 0,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _mostrarNuevoCliente(BuildContext context) {
+    final nombreCtrl = TextEditingController();
+    final emailCtrl = TextEditingController();
+    final telefonoCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    final service = ClienteService();
+    bool enviando = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            backgroundColor: ColorApp.colorSegundario,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Text('Nuevo cliente', style: TextStyle(color: ColorApp.colorTitulo)),
+            content: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: nombreCtrl,
+                    decoration: _inputDeco('Nombre'),
+                    style: const TextStyle(color: ColorApp.colorTexto),
+                    validator: (v) => v == null || v.isEmpty ? 'Requerido' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: emailCtrl,
+                    decoration: _inputDeco('Email (opcional)'),
+                    style: const TextStyle(color: ColorApp.colorTexto),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: telefonoCtrl,
+                    decoration: _inputDeco('Teléfono (opcional)'),
+                    style: const TextStyle(color: ColorApp.colorTexto),
+                    keyboardType: TextInputType.phone,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancelar', style: TextStyle(color: ColorApp.colorTextoMuted)),
+              ),
+              ElevatedButton.icon(
+                onPressed: enviando ? null : () async {
+                  if (!formKey.currentState!.validate()) return;
+                  setState(() => enviando = true);
+                  final data = <String, dynamic>{
+                    'nombre': nombreCtrl.text,
+                    if (emailCtrl.text.isNotEmpty) 'email': emailCtrl.text,
+                    if (telefonoCtrl.text.isNotEmpty) 'telefono': telefonoCtrl.text,
+                  };
+                  final exito = await service.crearCliente(data);
+                  if (!ctx.mounted) return;
+                  Navigator.pop(ctx);
+                  GlobalNotificacion.mostrar(
+                    mensaje: exito ? 'Cliente creado' : 'Error al crear cliente',
+                    color: exito ? ColorApp.colorExito : ColorApp.colorError,
                   );
                 },
                 icon: const Icon(Icons.save, color: Colors.white, size: 18),

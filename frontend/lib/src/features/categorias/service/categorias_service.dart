@@ -10,14 +10,14 @@ class CategoriasService {
       final response = await _dio.get('/api/categorias_productos');
       debugPrint("📡 [CategoriasService] GET /api/categorias_productos → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
-      
+
       final data = response.data;
       if (data is List) {
         return data.cast<Map<String, dynamic>>();
       }
       return [];
-    } on DioException catch (e) {
-      debugPrint("❌ [CategoriasService] GET /api/categorias_productos → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [CategoriasService] GET /api/categorias_productos → $e");
       return [];
     }
   }
@@ -30,8 +30,8 @@ class CategoriasService {
       debugPrint("📡 [CategoriasService] POST /api/categorias_productos → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       return true;
-    } on DioException catch (e) {
-      debugPrint("❌ [CategoriasService] POST /api/categorias_productos → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [CategoriasService] POST /api/categorias_productos → $e");
       return false;
     }
   }
@@ -46,8 +46,8 @@ class CategoriasService {
         return data.cast<Map<String, dynamic>>();
       }
       return [];
-    } on DioException catch (e) {
-      debugPrint("❌ [CategoriasService] GET /api/categorias_dispositivos → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [CategoriasService] GET /api/categorias_dispositivos → $e");
       return [];
     }
   }
@@ -58,8 +58,8 @@ class CategoriasService {
       debugPrint("📡 [CategoriasService] POST /api/categorias_dispositivos → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       return true;
-    } on DioException catch (e) {
-      debugPrint("❌ [CategoriasService] POST /api/categorias_dispositivos → ${e.response?.statusCode} ${e.response?.data}");
+    } catch (e) {
+      debugPrint("❌ [CategoriasService] POST /api/categorias_dispositivos → $e");
       return false;
     }
   }

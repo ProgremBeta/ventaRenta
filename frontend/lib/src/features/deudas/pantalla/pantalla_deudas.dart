@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/src/core/models/deuda.dart';
 import 'package:frontend/src/core/themes/color_app.dart';
+import 'package:frontend/src/core/widgets/global_notificacion.dart';
 import 'package:frontend/src/core/widgets/item_lista.dart';
-import 'package:frontend/src/core/widgets/toast_notificacion.dart';
 import 'package:frontend/src/features/deudas/provider/deudas_provider.dart';
 
 class PantallaDeudas extends StatefulWidget {
@@ -39,7 +39,13 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
             _detalleRow('Monto total', '\$${deuda.montoTotal?.toStringAsFixed(2) ?? '0.00'}'),
             _detalleRow('Pagado', '\$${deuda.montoPagado?.toStringAsFixed(2) ?? '0.00'}'),
             _detalleRow('Saldo pendiente', '\$${deuda.saldo?.toStringAsFixed(2) ?? '0.00'}'),
-            _detalleRow('Estado', deuda.estado ?? '—'),
+            _detalleRow('Estado', deuda.estado ?? '—',
+              colorValor: deuda.estado == 'pago' || deuda.estado == 'pagado'
+                  ? ColorApp.colorExito
+                  : deuda.estado == 'en deuda' || deuda.estado == 'pendiente'
+                      ? ColorApp.colorError
+                      : null,
+            ),
           ],
         ),
         actions: [
@@ -47,7 +53,7 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Cerrar', style: TextStyle(color: ColorApp.colorTextoMuted)),
           ),
-          if (deuda.estado != 'pagado')
+          if (deuda.estado != 'pagado' && deuda.estado != 'pago')
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.pop(ctx);
@@ -141,10 +147,9 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
                 });
                 if (!ctx.mounted) return;
                 Navigator.pop(ctx);
-                ToastNotificacion.mostrar(
-                  context,
+                GlobalNotificacion.mostrar(
                   mensaje: exito ? 'Pago registrado con éxito' : 'Error al registrar pago',
-                  tipo: exito ? TipoToast.exito : TipoToast.error,
+                  color: exito ? ColorApp.colorExito : ColorApp.colorError,
                 );
               },
               icon: const Icon(Icons.check, color: Colors.white, size: 18),
@@ -171,14 +176,14 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
     return c?.nombre ?? 'Cliente #$clienteId';
   }
 
-  Widget _detalleRow(String label, String value) {
+  Widget _detalleRow(String label, String value, {Color? colorValor}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(color: ColorApp.colorSubTitulo, fontSize: 14)),
-          Text(value, style: const TextStyle(color: ColorApp.colorTexto, fontSize: 14, fontWeight: FontWeight.w500)),
+          Text(value, style: TextStyle(color: colorValor ?? ColorApp.colorTexto, fontSize: 14, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -247,31 +252,25 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
           final Color? colorBorde;
           final Color? colorFondo;
           switch (deuda.estado) {
+            case 'pago':
             case 'pagado':
               colorBorde = ColorApp.colorExito;
               colorFondo = ColorApp.colorExito.withValues(alpha: 0.08);
+            case 'en deuda':
             case 'pendiente':
-              colorBorde = ColorApp.colorAdvertencia;
-              colorFondo = ColorApp.colorAdvertencia.withValues(alpha: 0.08);
+              colorBorde = ColorApp.colorError;
+              colorFondo = ColorApp.colorError.withValues(alpha: 0.08);
             default:
               colorBorde = null;
               colorFondo = null;
           }
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            decoration: BoxDecoration(
-              color: colorFondo,
-              borderRadius: BorderRadius.circular(12),
-              border: colorBorde != null
-                  ? Border.all(color: colorBorde, width: 1.5)
-                  : null,
-            ),
-            child: ItemLista(
-              titulo: 'Deuda #${deuda.id}',
-              subtitulo: _nombreCliente(deuda.clienteId),
-              detalle: '\$${deuda.saldo?.toStringAsFixed(0) ?? '0'}',
-              onTap: () => _mostrarDetalle(deuda),
-            ),
+          return ItemLista(
+            titulo: 'Deuda #${deuda.id}',
+            subtitulo: _nombreCliente(deuda.clienteId),
+            detalle: '\$${deuda.saldo?.toStringAsFixed(0) ?? '0'}',
+            onTap: () => _mostrarDetalle(deuda),
+            colorFondo: colorFondo,
+            colorBorde: colorBorde,
           );
         },
       ),

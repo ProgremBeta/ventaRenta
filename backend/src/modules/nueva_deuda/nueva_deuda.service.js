@@ -45,7 +45,7 @@ export const crearDeuda = async (datos) => {
 
   const saldo = montoTotal;
   let pago = datos?.monto_pagado || 0;
-  const estado = datos?.estado || true;
+  const estado = datos?.estado || "en deuda";
 
   const deuda = await deudaRepository.crearDeuda({
     cliente_id: cliente[0].id,

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:frontend/src/core/providers/auth_provider.dart';
 import 'package:frontend/src/core/themes/color_app.dart';
 import 'package:frontend/src/core/themes/estilos_app.dart';
-import 'package:frontend/src/core/widgets/toast_notificacion.dart';
+import 'package:frontend/src/core/widgets/global_notificacion.dart';
 import 'package:frontend/src/features/usuarios/service/usuarios_service.dart';
 import 'package:frontend/src/features/ventas/service/ventas_services.dart';
 
@@ -90,15 +90,9 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                 ),
                 const SizedBox(height: 32),
                 _botonAccion(
-                  icono: Icons.person_add,
-                  label: 'Crear usuario',
-                  onTap: () => _mostrarCrearUsuario(context),
-                ),
-                const SizedBox(height: 12),
-                _botonAccion(
-                  icono: Icons.person_search,
-                  label: 'Modificar usuario',
-                  onTap: () => _mostrarModificarUsuario(context),
+                  icono: Icons.people,
+                  label: 'Usuarios',
+                  onTap: () => _mostrarDialogoUsuarios(context),
                 ),
                 const SizedBox(height: 12),
                 _botonAccion(
@@ -153,7 +147,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
     );
   }
 
-  void _mostrarCrearUsuario(BuildContext context) {
+  Future<void> _mostrarCrearUsuario(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     final esAdmin = auth.userRolId == 1;
     final nombreCtrl = TextEditingController();
@@ -166,7 +160,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
     final service = UsuariosService();
     bool enviando = false;
 
-    showDialog(
+    await showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
@@ -251,10 +245,9 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                 final exito = await service.crearUsuario(data);
                 if (!ctx.mounted) return;
                 Navigator.pop(ctx);
-                ToastNotificacion.mostrar(
-                  context,
+                GlobalNotificacion.mostrar(
                   mensaje: exito ? 'Usuario creado' : 'Error al crear usuario',
-                  tipo: exito ? TipoToast.exito : TipoToast.error,
+                  color: exito ? ColorApp.colorExito : ColorApp.colorError,
                 );
               },
               icon: const Icon(Icons.save, color: Colors.white, size: 18),
@@ -270,22 +263,80 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
     );
   }
 
-  void _mostrarModificarUsuario(BuildContext context) {
+  void _mostrarDialogoUsuarios(BuildContext context) {
     final service = UsuariosService();
+
+    service.usuarios().then((usuarios) {
+      if (!context.mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) {
+          List<Map<String, dynamic>> listaUsuarios = List.from(usuarios);
+          return StatefulBuilder(
+            builder: (context, setState) => AlertDialog(
+              backgroundColor: ColorApp.colorSegundario,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                children: [
+                  const Expanded(
+                    child: Text('Usuarios', style: TextStyle(color: ColorApp.colorTitulo)),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add, color: ColorApp.colorAcento),
+                    tooltip: 'Crear usuario',
+                    onPressed: () => _mostrarCrearUsuario(context).then((_) {
+                      service.usuarios().then((updated) {
+                        if (context.mounted) setState(() => listaUsuarios = List.from(updated));
+                      });
+                    }),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: ColorApp.colorAcento),
+                    tooltip: 'Editar usuario',
+                    onPressed: () => _mostrarSeleccionarUsuario(context, listaUsuarios).then((_) {
+                      service.usuarios().then((updated) {
+                        if (context.mounted) setState(() => listaUsuarios = List.from(updated));
+                      });
+                    }),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: listaUsuarios.map((u) {
+                    final nombre = u['nombre'] as String? ?? '';
+                    final identificacion = u['identificacion'] as String? ?? '—';
+                    return ListTile(
+                      title: Text(nombre, style: const TextStyle(color: ColorApp.colorTexto)),
+                      subtitle: Text('ID: $identificacion', style: const TextStyle(color: ColorApp.colorSubTitulo, fontSize: 13)),
+                      contentPadding: EdgeInsets.zero,
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cerrar', style: TextStyle(color: ColorApp.colorAcento)),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    });
+  }
+
+  Future<void> _mostrarSeleccionarUsuario(BuildContext context, List<Map<String, dynamic>> usuarios) async {
     final searchCtrl = TextEditingController();
 
-    showDialog(
+    await showDialog(
       context: context,
       builder: (ctx) {
-        List<Map<String, dynamic>> usuarios = [];
         return StatefulBuilder(
           builder: (context, setDialogState) {
-            if (usuarios.isEmpty) {
-              service.usuarios().then((u) {
-                if (context.mounted) setDialogState(() => usuarios = u);
-              });
-            }
-
             final filtrados = usuarios.where((u) {
               if (searchCtrl.text.isEmpty) return false;
               return (u['nombre'] as String? ?? '')
@@ -296,7 +347,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
             return AlertDialog(
               backgroundColor: ColorApp.colorSegundario,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text('Modificar usuario', style: TextStyle(color: ColorApp.colorTitulo)),
+              title: const Text('Seleccionar usuario', style: TextStyle(color: ColorApp.colorTitulo)),
               content: SizedBox(
                 width: double.maxFinite,
                 child: Column(
@@ -309,12 +360,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                       onChanged: (_) => setDialogState(() {}),
                     ),
                     const SizedBox(height: 12),
-                    if (usuarios.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.all(20),
-                        child: CircularProgressIndicator(color: ColorApp.colorAcento),
-                      )
-                    else if (searchCtrl.text.isNotEmpty && filtrados.isEmpty)
+                    if (searchCtrl.text.isNotEmpty && filtrados.isEmpty)
                       const Padding(
                         padding: EdgeInsets.all(20),
                         child: Text('Sin resultados', style: TextStyle(color: ColorApp.colorTextoMuted)),
@@ -327,17 +373,23 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                           children: filtrados.map((u) {
                             final id = u['id'] as int? ?? 0;
                             final nombre = u['nombre'] as String? ?? '';
+                            final identificacion = u['identificacion'] as String? ?? '—';
                             return ListTile(
                               dense: true,
                               title: Text(nombre, style: const TextStyle(color: ColorApp.colorTexto)),
-                              subtitle: Text('ID: $id', style: const TextStyle(color: ColorApp.colorSubTitulo)),
+                              subtitle: Text('ID: $identificacion', style: const TextStyle(color: ColorApp.colorSubTitulo)),
                               onTap: () {
                                 Navigator.pop(ctx);
-                                _mostrarEditarUsuario(context, id.toString(), u);
+                                _mostrarEditarUsuario(context, identificacion, u);
                               },
                             );
                           }).toList(),
                         ),
+                      )
+                    else
+                      const Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Text('Escribe para buscar...', style: TextStyle(color: ColorApp.colorTextoMuted)),
                       ),
                   ],
                 ),
@@ -356,12 +408,15 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
   }
 
   void _mostrarEditarUsuario(BuildContext context, String id, Map<String, dynamic> userData) {
+    final auth = context.read<AuthProvider>();
+    final esAdmin = auth.userRolId == 1;
     final nombreCtrl = TextEditingController(text: userData['nombre'] as String? ?? '');
     final emailCtrl = TextEditingController(text: userData['email'] as String? ?? '');
     final telefonoCtrl = TextEditingController(text: userData['telefono'] as String? ?? '');
     final passCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
     final service = UsuariosService();
+    int? rolSeleccionado = userData['rol_id'] as int?;
     bool enviando = false;
 
     showDialog(
@@ -400,6 +455,21 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   decoration: _inputDeco('Nueva contraseña (opcional)'),
                   style: const TextStyle(color: ColorApp.colorTexto),
                 ),
+                if (esAdmin) ...[
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<int>(
+                    value: rolSeleccionado,
+                    items: const [
+                      DropdownMenuItem(value: 1, child: Text('Admin', style: TextStyle(color: ColorApp.colorTexto))),
+                      DropdownMenuItem(value: 2, child: Text('Usuario', style: TextStyle(color: ColorApp.colorTexto))),
+                      DropdownMenuItem(value: 3, child: Text('Cajero', style: TextStyle(color: ColorApp.colorTexto))),
+                    ],
+                    onChanged: (v) => setState(() => rolSeleccionado = v),
+                    decoration: _inputDeco('Rol'),
+                    dropdownColor: ColorApp.colorElevado,
+                    style: const TextStyle(color: ColorApp.colorTexto),
+                  ),
+                ],
               ],
             ),
           ),
@@ -418,13 +488,13 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                   'telefono': telefonoCtrl.text,
                 };
                 if (passCtrl.text.isNotEmpty) data['contrasena_hash'] = passCtrl.text;
+                if (esAdmin && rolSeleccionado != null) data['rol_id'] = rolSeleccionado;
                 final exito = await service.actualizarUsuario(id, data);
                 if (!ctx.mounted) return;
                 Navigator.pop(ctx);
-                ToastNotificacion.mostrar(
-                  context,
+                GlobalNotificacion.mostrar(
                   mensaje: exito ? 'Usuario actualizado' : 'Error al actualizar',
-                  tipo: exito ? TipoToast.exito : TipoToast.error,
+                  color: exito ? ColorApp.colorExito : ColorApp.colorError,
                 );
               },
               icon: const Icon(Icons.save, color: Colors.white, size: 18),
@@ -553,7 +623,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                 if (!ctx.mounted) return;
                 Navigator.pop(ctx);
                 if (exito) {
-                  ToastNotificacion.mostrar(context, mensaje: 'Método de pago creado', tipo: TipoToast.exito);
+                  GlobalNotificacion.exito('Método de pago creado');
                 }
               },
               icon: const Icon(Icons.save, color: Colors.white, size: 18),
@@ -641,10 +711,9 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                 final exito = await service.actualizarMetodoPago(metodoSeleccionado!, data);
                 if (!ctx.mounted) return;
                 Navigator.pop(ctx);
-                ToastNotificacion.mostrar(
-                  context,
+                GlobalNotificacion.mostrar(
                   mensaje: exito ? 'Método actualizado' : 'Error al actualizar',
-                  tipo: exito ? TipoToast.exito : TipoToast.error,
+                  color: exito ? ColorApp.colorExito : ColorApp.colorError,
                 );
               },
               icon: const Icon(Icons.save, color: Colors.white, size: 18),
@@ -761,7 +830,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                 if (!ctx.mounted) return;
                 Navigator.pop(ctx);
                 if (exito) {
-                  ToastNotificacion.mostrar(context, mensaje: 'Rol creado', tipo: TipoToast.exito);
+                  GlobalNotificacion.exito('Rol creado');
                 }
               },
               icon: const Icon(Icons.save, color: Colors.white, size: 18),
@@ -841,10 +910,9 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                 final exito = await service.actualizarRol(rolSeleccionado!, {'nombre': nomCtrl.text});
                 if (!ctx.mounted) return;
                 Navigator.pop(ctx);
-                ToastNotificacion.mostrar(
-                  context,
+                GlobalNotificacion.mostrar(
                   mensaje: exito ? 'Rol actualizado' : 'Error al actualizar',
-                  tipo: exito ? TipoToast.exito : TipoToast.error,
+                  color: exito ? ColorApp.colorExito : ColorApp.colorError,
                 );
               },
               icon: const Icon(Icons.save, color: Colors.white, size: 18),

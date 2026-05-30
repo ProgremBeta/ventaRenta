@@ -22,6 +22,7 @@ class DeudasProvider extends ChangeNotifier {
     notifyListeners();
 
     _deudas = await _service.deudas();
+    _deudas.sort((a, b) => (b.fechaCreacion ?? '').compareTo(a.fechaCreacion ?? ''));
 
     _isLoading = false;
     notifyListeners();

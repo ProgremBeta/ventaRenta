@@ -4,8 +4,6 @@ export const obtenerRentas = async (req, res, next) => {
   try {
     const result = await service.obtenerRentas();
 
-    console.log("resultado de la rentas: ", result);
-
     if (!result || result.length === 0) {
       console.log("no se encontraron datos de rentas")
       return res.status(400).json({ message: "no se encontraron datos de rentas" });

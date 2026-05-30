@@ -6,11 +6,14 @@ import * as clientesService from '../clientes/clientes.service.js';
 
 export const nuevaVenta = async (datos) => {
 
-  const clienteId = datos.cliente_id || null;
+  const clienteId = datos.cliente_id;
+
+  console.log("cliente_id: ", clienteId)
 
   if (clienteId) {
+    console.log("si se ingreso algun cliente pasara por aqui")
     const cliente = await clientesService.obtenerClientePorId(clienteId);
-    if (!cliente || cliente) {
+    if (!cliente || cliente.length === 0) {
       throw new Error(`Cliente con id ${clienteId} no encontrado`);
     }
   }

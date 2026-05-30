@@ -7,6 +7,8 @@ class ItemLista extends StatelessWidget {
   final String? subtitulo;
   final String? detalle;
   final VoidCallback? onTap;
+  final Color? colorFondo;
+  final Color? colorBorde;
 
   const ItemLista({
     super.key,
@@ -14,6 +16,8 @@ class ItemLista extends StatelessWidget {
     this.subtitulo,
     this.detalle,
     this.onTap,
+    this.colorFondo,
+    this.colorBorde,
   });
 
   @override
@@ -24,7 +28,7 @@ class ItemLista extends StatelessWidget {
         vertical: EstilosApp.paddingPequeno / 2,
       ),
       child: Material(
-        color: ColorApp.colorElevado,
+        color: colorFondo ?? ColorApp.colorElevado,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           onTap: onTap,
@@ -33,7 +37,7 @@ class ItemLista extends StatelessWidget {
             padding: const EdgeInsets.all(EstilosApp.paddingMedio),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: ColorApp.colorBordeInput.withValues(alpha: 0.3)),
+              border: Border.all(color: colorBorde ?? ColorApp.colorBordeInput.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [

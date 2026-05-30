@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/src/core/models/renta.dart';
-
 import 'package:frontend/src/core/themes/color_app.dart';
 import 'package:frontend/src/core/widgets/item_lista.dart';
-import 'package:frontend/src/core/widgets/toast_notificacion.dart';
+import 'package:frontend/src/core/widgets/global_notificacion.dart';
 import 'package:frontend/src/core/providers/auth_provider.dart';
 import 'package:frontend/src/features/rentas/provider/rentas_provider.dart';
 
@@ -22,26 +21,27 @@ class _PantallaRentasState extends State<PantallaRentas> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final p = context.read<RentasProvider>();
       p.fetchRentas();
-      p.fetchClientes();
       p.fetchDispositivos();
+      p.fetchMetodosPago();
     });
   }
 
-  String _nombreCliente(RentasProvider p, int? clienteId) {
-    if (clienteId == null) return 'Sin cliente';
-    final c = p.clientes.where((c) => c.id == clienteId).firstOrNull;
-    return c?.nombre ?? 'Cliente #$clienteId';
+  Duration _calcularTiempoTranscurrido(String? fechaInicio) {
+    if (fechaInicio == null) return Duration.zero;
+    final inicio = DateTime.tryParse(fechaInicio);
+    if (inicio == null) return Duration.zero;
+    return DateTime.now().difference(inicio);
   }
 
-  String _nombreDispositivo(RentasProvider p, int? dispositivoId) {
-    if (dispositivoId == null) return '—';
-    final d = p.dispositivos.where((d) => d.id == dispositivoId).firstOrNull;
-    return d?.nombre ?? 'Disp #$dispositivoId';
+  double _precioFinal(Renta r) {
+    return r.precioTotal ?? 0;
   }
 
   void _mostrarDetalle(Renta renta) {
     final provider = context.read<RentasProvider>();
-    provider.fetchDetalleRenta(renta.id);
+    provider.fetchRentaPorId(renta.id);
+
+    final esActiva = renta.estado == 'renta';
 
     showDialog(
       context: context,
@@ -51,44 +51,26 @@ class _PantallaRentasState extends State<PantallaRentas> {
         title: Text('Renta #${renta.id}', style: const TextStyle(color: ColorApp.colorTitulo)),
         content: Consumer<RentasProvider>(
           builder: (context, p, _) {
+            final r = p.rentaActual ?? renta;
+            final transcurrido = esActiva ? _calcularTiempoTranscurrido(r.fechaInicio) : Duration.zero;
+            final precioEstimado = esActiva ? _precioFinal(r) : 0.0;
+
             return SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _detalleRow('Usuario ID', renta.usuarioId?.toString() ?? '—'),
-                  _detalleRow('Cliente', _nombreCliente(p, renta.clienteId)),
-                  _detalleRow('Inicio', renta.fechaInicio ?? '—'),
-                  _detalleRow('Fin', renta.fechaFin ?? '—'),
-                  _detalleRow('Tiempo total', renta.tiempoTotal ?? '—'),
-                  _detalleRow('Precio total', renta.precioTotal != null ? '\$${renta.precioTotal!.toStringAsFixed(2)}' : '—'),
-                  _detalleRow('Método pago', renta.metodoPago?.toString() ?? '—'),
-                  _detalleRow('Estado', renta.estado ?? '—'),
-                  if (p.detalleActual.isNotEmpty) ...[
+                  _detalleRow('Inicio', r.fechaInicio ?? '—'),
+                  _detalleRow('Fin', r.fechaFin ?? '—'),
+                  _detalleRow('Estado', r.estado ?? '—'),
+                  if (esActiva) ...[
                     const Divider(color: ColorApp.colorBordeInput, height: 24),
-                    const Text('Dispositivos', style: TextStyle(color: ColorApp.colorTitulo, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
-                    ...p.detalleActual.map((d) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                _nombreDispositivo(p, d.dispositivoId),
-                                style: const TextStyle(color: ColorApp.colorTexto),
-                              ),
-                            ),
-                            Text(d.tiempoTotal ?? '', style: const TextStyle(color: ColorApp.colorSubTitulo)),
-                            const SizedBox(width: 12),
-                            Text(
-                              d.subTotal != null ? '\$${d.subTotal!.toStringAsFixed(0)}' : '—',
-                              style: const TextStyle(color: ColorApp.colorAcento, fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
+                    _detalleRow('Tiempo transcurrido', '${transcurrido.inHours}h ${transcurrido.inMinutes % 60}m'),
+                    _detalleRow('Precio estimado', '\$${precioEstimado.toStringAsFixed(0)}'),
+                  ],
+                  if (!esActiva) ...[
+                    _detalleRow('Tiempo total', r.tiempoTotal ?? '—'),
+                    _detalleRow('Precio total', r.precioTotal != null ? '\$${r.precioTotal!.toStringAsFixed(0)}' : '—'),
                   ],
                 ],
               ),
@@ -100,21 +82,30 @@ class _PantallaRentasState extends State<PantallaRentas> {
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Cerrar', style: TextStyle(color: ColorApp.colorTextoMuted)),
           ),
-          if (renta.estado == 'activa')
+          if (esActiva) ...[
+            TextButton.icon(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _mostrarExtenderRenta(renta);
+              },
+              icon: const Icon(Icons.update, color: ColorApp.colorAcento, size: 18),
+              label: const Text('Extender', style: TextStyle(color: ColorApp.colorAcento)),
+            ),
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.pop(ctx);
                 _mostrarFinalizarRenta(renta);
               },
-              icon: const Icon(Icons.check_circle, color: Colors.white, size: 18),
-              label: const Text('Finalizar renta'),
+              icon: const Icon(Icons.stop_circle, color: Colors.white, size: 18),
+              label: const Text('Detener renta'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: ColorApp.colorExito,
+                backgroundColor: ColorApp.colorError,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 elevation: 0,
               ),
             ),
+          ],
         ],
       ),
     );
@@ -130,9 +121,22 @@ class _PantallaRentasState extends State<PantallaRentas> {
           backgroundColor: ColorApp.colorSegundario,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Text('Finalizar renta', style: TextStyle(color: ColorApp.colorTitulo)),
-          content: Text(
-            '¿Estás seguro de finalizar la renta #${renta.id}?',
-            style: const TextStyle(color: ColorApp.colorTexto),
+          content: Consumer<RentasProvider>(
+            builder: (context, prov, _) {
+              final r = prov.rentaActual ?? renta;
+              final transcurrido = _calcularTiempoTranscurrido(r.fechaInicio);
+              final precioFinal = _precioFinal(r);
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Renta #${r.id}', style: const TextStyle(color: ColorApp.colorTexto)),
+                  const SizedBox(height: 8),
+                  _detalleRow('Tiempo', '${transcurrido.inHours}h ${transcurrido.inMinutes % 60}m'),
+                  _detalleRow('Total a pagar', '\$${precioFinal.toStringAsFixed(0)}'),
+                ],
+              );
+            },
           ),
           actions: [
             TextButton(
@@ -142,14 +146,26 @@ class _PantallaRentasState extends State<PantallaRentas> {
             ElevatedButton.icon(
               onPressed: enviando ? null : () async {
                 setState(() => enviando = true);
-                final exito = await context.read<RentasProvider>().finalizarRenta(renta.id);
+                final prov = context.read<RentasProvider>();
+                final r = prov.rentaActual ?? renta;
+                final transcurrido = _calcularTiempoTranscurrido(r.fechaInicio);
+                final precioTotal = _precioFinal(r);
+
+                final data = {
+                  'estado': 'finalizada',
+                  'fecha_fin': DateTime.now().toIso8601String(),
+                  'tiempo_total': '${transcurrido.inHours}h ${transcurrido.inMinutes % 60}m',
+                  'precio_total': precioTotal,
+                };
+                final exito = await prov.service.actualizarRenta(renta.id, data);
                 if (!ctx.mounted) return;
                 Navigator.pop(ctx);
-                ToastNotificacion.mostrar(
-                  context,
-                  mensaje: exito ? 'Renta finalizada' : 'Error al finalizar renta',
-                  tipo: exito ? TipoToast.exito : TipoToast.error,
-                );
+                if (exito != null) {
+                  GlobalNotificacion.exito('Renta finalizada — Total: \$${precioTotal.toStringAsFixed(0)}');
+                  prov.fetchRentas();
+                } else {
+                  GlobalNotificacion.error('Error al finalizar renta');
+                }
               },
               icon: const Icon(Icons.check, color: Colors.white, size: 18),
               label: enviando
@@ -168,10 +184,117 @@ class _PantallaRentasState extends State<PantallaRentas> {
     );
   }
 
+  void _mostrarExtenderRenta(Renta renta) {
+    final horasCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool enviando = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: ColorApp.colorSegundario,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Extender renta', style: TextStyle(color: ColorApp.colorTitulo)),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Renta #${renta.id}', style: const TextStyle(color: ColorApp.colorSubTitulo)),
+                const SizedBox(height: 4),
+                Text('Fin actual: ${renta.fechaFin ?? '—'}', style: const TextStyle(color: ColorApp.colorTextoMuted, fontSize: 13)),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: horasCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                    labelText: 'Horas a agregar (ej: 1.5)',
+                    labelStyle: const TextStyle(color: ColorApp.colorTextoMuted),
+                    filled: true,
+                    fillColor: ColorApp.colorFondoInput,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: ColorApp.colorBordeInput),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: ColorApp.colorBordeInput),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: ColorApp.colorBordeFoco, width: 2),
+                    ),
+                  ),
+                  style: const TextStyle(color: ColorApp.colorTexto),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Requerido';
+                    final h = double.tryParse(v);
+                    if (h == null || h <= 0) return 'Ingrese un número válido';
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar', style: TextStyle(color: ColorApp.colorTextoMuted)),
+            ),
+            ElevatedButton.icon(
+              onPressed: enviando ? null : () async {
+                if (!formKey.currentState!.validate()) return;
+                setState(() => enviando = true);
+                final horasExtra = double.parse(horasCtrl.text);
+                final prov = context.read<RentasProvider>();
+                final r = prov.rentaActual ?? renta;
+                final inicio = DateTime.tryParse(r.fechaInicio ?? '');
+                final finOrig = DateTime.tryParse(r.fechaFin ?? '');
+                if (inicio == null || finOrig == null) return;
+                final nuevoFin = finOrig.add(Duration(minutes: (horasExtra * 60).round()));
+                final duracionOrig = finOrig.difference(inicio).inMinutes / 60.0;
+                final precioPorHora = duracionOrig > 0 ? (r.precioTotal ?? 0) / duracionOrig : 0;
+                final precioTotal = precioPorHora * (duracionOrig + horasExtra);
+
+                final data = {
+                  'fecha_fin': nuevoFin.toIso8601String(),
+                  'precio_total': precioTotal,
+                  'tiempo_total': '${nuevoFin.difference(DateTime.tryParse(renta.fechaInicio ?? '')!).inHours}h ${nuevoFin.difference(DateTime.tryParse(renta.fechaInicio ?? '')!).inMinutes % 60}m',
+                  'estado': 'renta',
+                };
+                final exito = await prov.service.actualizarRenta(renta.id, data);
+                if (!ctx.mounted) return;
+                Navigator.pop(ctx);
+                if (exito != null) {
+                  GlobalNotificacion.exito('Renta extendida hasta ${nuevoFin.day}/${nuevoFin.month} ${nuevoFin.hour}:${nuevoFin.minute.toString().padLeft(2, '0')}');
+                  prov.fetchRentas();
+                } else {
+                  GlobalNotificacion.error('Error al extender renta');
+                }
+              },
+              icon: const Icon(Icons.update, color: Colors.white, size: 18),
+              label: enviando
+                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Text('Extender'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorApp.colorAcento,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                elevation: 0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _mostrarFormulario() {
     final provider = context.read<RentasProvider>();
-    provider.fetchClientes();
     provider.fetchDispositivos();
+    provider.fetchClientes();
+    provider.fetchMetodosPago();
 
     showDialog(
       context: context,
@@ -237,11 +360,14 @@ class _PantallaRentasState extends State<PantallaRentas> {
         itemCount: provider.rentas.length,
         itemBuilder: (context, index) {
           final renta = provider.rentas[index];
+          final esActiva = renta.estado == 'renta';
           return ItemLista(
-            titulo: _nombreCliente(provider, renta.clienteId),
-            subtitulo: '${renta.fechaInicio ?? '—'} → ${renta.fechaFin ?? '—'}  |  ${renta.estado ?? '—'}',
-            detalle: renta.tiempoTotal ?? '',
+            titulo: '#${renta.id}  ${provider.dispositivos.where((d) => renta.id == d.id).firstOrNull?.nombre ?? ''}',
+            subtitulo: '${renta.fechaInicio ?? '—'}  |  ${renta.estado ?? '—'}',
+            detalle: esActiva ? 'En renta' : (renta.tiempoTotal ?? ''),
             onTap: () => _mostrarDetalle(renta),
+            colorFondo: esActiva ? ColorApp.colorExito.withValues(alpha: 0.08) : null,
+            colorBorde: esActiva ? ColorApp.colorExito : null,
           );
         },
       ),
@@ -256,47 +382,16 @@ class _FormularioNuevaRenta extends StatefulWidget {
 
 class _FormularioNuevaRentaState extends State<_FormularioNuevaRenta> {
   final _formKey = GlobalKey<FormState>();
-  int? _clienteId;
   int? _dispositivoId;
-  DateTime _fechaInicio = DateTime.now();
-  DateTime _fechaFin = DateTime.now().add(const Duration(hours: 1));
+  int? _metodoPagoId;
+  int? _clienteId;
+  final _duracionCtrl = TextEditingController();
   bool _enviando = false;
 
-  Future<void> _seleccionarFecha(bool esInicio) async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: esInicio ? _fechaInicio : _fechaFin,
-      firstDate: DateTime.now().subtract(const Duration(days: 30)),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (context, child) => Theme(
-        data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(primary: ColorApp.colorAcento),
-        ),
-        child: child!,
-      ),
-    );
-    if (picked != null) {
-      final time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(esInicio ? _fechaInicio : _fechaFin),
-        builder: (context, child) => Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(primary: ColorApp.colorAcento),
-          ),
-          child: child!,
-        ),
-      );
-      if (time != null) {
-        final combined = DateTime(picked.year, picked.month, picked.day, time.hour, time.minute);
-        setState(() {
-          if (esInicio) {
-            _fechaInicio = combined;
-          } else {
-            _fechaFin = combined;
-          }
-        });
-      }
-    }
+  @override
+  void dispose() {
+    _duracionCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -314,23 +409,33 @@ class _FormularioNuevaRentaState extends State<_FormularioNuevaRenta> {
           mainAxisSize: MainAxisSize.min,
           children: [
             DropdownButtonFormField<int>(
-              value: _clienteId,
-              items: [
-                const DropdownMenuItem(value: null, child: Text('Ninguno', style: TextStyle(color: ColorApp.colorTextoMuted))),
-                ...provider.clientes.map((c) {
-                  return DropdownMenuItem(value: c.id, child: Text(c.nombre, style: const TextStyle(color: ColorApp.colorTexto)));
-                }),
-              ],
-              onChanged: (v) => _clienteId = v,
-              decoration: _inputDeco('Cliente'),
-              dropdownColor: ColorApp.colorElevado,
-              style: const TextStyle(color: ColorApp.colorTexto),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<int>(
-              value: _dispositivoId,
+              initialValue: _dispositivoId,
               items: provider.dispositivos.map((d) {
-                return DropdownMenuItem(value: d.id, child: Text(d.nombre ?? 'Disp #${d.id}', style: const TextStyle(color: ColorApp.colorTexto)));
+                final enRenta = d.estado == 'en renta';
+                return DropdownMenuItem(
+                  value: d.id,
+                  enabled: !enRenta,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: enRenta ? ColorApp.colorError : ColorApp.colorExito,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${d.nombre ?? 'Disp #${d.id}'} — \$${(d.precioHora ?? 0).toStringAsFixed(0)}/h',
+                        style: TextStyle(
+                          color: enRenta ? ColorApp.colorTextoMuted : ColorApp.colorTexto,
+                          decoration: enRenta ? TextDecoration.lineThrough : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               }).toList(),
               onChanged: (v) => _dispositivoId = v,
               decoration: _inputDeco('Dispositivo'),
@@ -338,26 +443,41 @@ class _FormularioNuevaRentaState extends State<_FormularioNuevaRenta> {
               style: const TextStyle(color: ColorApp.colorTexto),
             ),
             const SizedBox(height: 12),
-            InkWell(
-              onTap: () => _seleccionarFecha(true),
-              child: InputDecorator(
-                decoration: _inputDeco('Fecha inicio'),
-                child: Text(
-                  '${_fechaInicio.day}/${_fechaInicio.month}/${_fechaInicio.year} ${_fechaInicio.hour}:${_fechaInicio.minute.toString().padLeft(2, '0')}',
-                  style: const TextStyle(color: ColorApp.colorTexto),
-                ),
-              ),
+            TextFormField(
+              controller: _duracionCtrl,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: _inputDeco('Duración (horas, ej: 1.5)'),
+              style: const TextStyle(color: ColorApp.colorTexto),
+              validator: (v) {
+                if (v == null || v.isEmpty) return 'Requerido';
+                final d = double.tryParse(v);
+                if (d == null || d <= 0) return 'Ingrese un número válido';
+                return null;
+              },
             ),
             const SizedBox(height: 12),
-            InkWell(
-              onTap: () => _seleccionarFecha(false),
-              child: InputDecorator(
-                decoration: _inputDeco('Fecha fin'),
-                child: Text(
-                  '${_fechaFin.day}/${_fechaFin.month}/${_fechaFin.year} ${_fechaFin.hour}:${_fechaFin.minute.toString().padLeft(2, '0')}',
-                  style: const TextStyle(color: ColorApp.colorTexto),
-                ),
-              ),
+            DropdownButtonFormField<int>(
+              initialValue: _metodoPagoId,
+              items: provider.metodosPago.map((m) {
+                return DropdownMenuItem(value: m.id, child: Text(m.nombre, style: const TextStyle(color: ColorApp.colorTexto)));
+              }).toList(),
+              onChanged: (v) => _metodoPagoId = v,
+              decoration: _inputDeco('Método de pago'),
+              dropdownColor: ColorApp.colorElevado,
+              style: const TextStyle(color: ColorApp.colorTexto),
+              validator: (v) => v == null ? 'Seleccione un método' : null,
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<int>(
+              initialValue: _clienteId,
+              items: [
+                const DropdownMenuItem(value: null, child: Text('Sin cliente', style: TextStyle(color: ColorApp.colorTextoMuted))),
+                ...provider.clientes.map((c) => DropdownMenuItem(value: c.id, child: Text(c.nombre, style: const TextStyle(color: ColorApp.colorTexto)))),
+              ],
+              onChanged: (v) => _clienteId = v,
+              decoration: _inputDeco('Cliente (opcional)'),
+              dropdownColor: ColorApp.colorElevado,
+              style: const TextStyle(color: ColorApp.colorTexto),
             ),
           ],
         ),
@@ -372,16 +492,22 @@ class _FormularioNuevaRentaState extends State<_FormularioNuevaRenta> {
             if (!_formKey.currentState!.validate()) return;
             setState(() => _enviando = true);
 
-            final data = {
+            final dispositivo = provider.dispositivos.where((d) => d.id == _dispositivoId).firstOrNull;
+            final duracionHoras = double.parse(_duracionCtrl.text);
+            final ahora = DateTime.now();
+            final fechaFin = ahora.add(Duration(minutes: (duracionHoras * 60).round()));
+
+            final data = <String, dynamic>{
+              'usuario_id': auth.userId ?? 1,
+              'fecha_inicio': ahora.toIso8601String(),
+              'fecha_fin': fechaFin.toIso8601String(),
+              'duracion': duracionHoras,
+              'metodo_pago': _metodoPagoId,
+              'dispositivo_id': _dispositivoId,
+              'precio_hora': dispositivo?.precioHora?.toInt() ?? 0,
               if (_clienteId != null) 'cliente_id': _clienteId,
-              'usuario_id': auth.userRolId ?? 1,
-              'fecha_inicio': _fechaInicio.toIso8601String(),
-              'fecha_fin': _fechaFin.toIso8601String(),
-              'metodo_pago': 1,
-              'dispositivos': [
-                {'dispositivo_id': _dispositivoId, 'precio_hora': 5000},
-              ],
             };
+            debugPrint("📡 [RentaForm] data a enviar: $data");
 
             final exito = await context.read<RentasProvider>().iniciarRenta(data);
 
@@ -389,9 +515,9 @@ class _FormularioNuevaRentaState extends State<_FormularioNuevaRenta> {
             Navigator.pop(context);
 
             if (exito) {
-              ToastNotificacion.mostrar(context, mensaje: 'Renta iniciada con éxito', tipo: TipoToast.exito);
+              GlobalNotificacion.exito('Renta iniciada con éxito');
             } else {
-              ToastNotificacion.mostrar(context, mensaje: 'Error al iniciar renta', tipo: TipoToast.error);
+              GlobalNotificacion.error('Error al iniciar renta');
             }
           },
           icon: const Icon(Icons.check, color: Colors.white, size: 18),

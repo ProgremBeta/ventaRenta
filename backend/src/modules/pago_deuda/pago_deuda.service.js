@@ -29,7 +29,7 @@ export const pagoDeudas = async (data) => {
   }
 
   // Validar que la deuda no esté completamente pagada
-  if (deuda.estado === 'pagado') {
+  if (deuda.estado === 'pago') {
     throw new Error(`La deuda con id ${deudaId} ya está pagada`);
   }
 
@@ -50,7 +50,7 @@ export const pagoDeudas = async (data) => {
   const montoPagadoAnterior = parseFloat(deuda.monto_pagado || 0);
   const montoPagadoNuevo = montoPagadoAnterior + monto;
   const saldoNuevo = parseFloat(deuda.monto_total) - montoPagadoNuevo;
-  const estadoNuevo = saldoNuevo <= 0 ? 'pagado' : 'pendiente';
+  const estadoNuevo = saldoNuevo <= 0 ? 'pago' : 'en deuda';
 
   // asigna los datos a la base de datos
   const deudaActualizada = await deudaRepository.actualizarDeuda(deudaId, {
