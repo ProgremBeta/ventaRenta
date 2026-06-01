@@ -1,4 +1,4 @@
-import express, { Router } from 'express';
+import express from 'express';
 
 import * as controller from './metodos_pagos.controller.js';
 

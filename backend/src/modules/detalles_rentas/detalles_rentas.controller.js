@@ -42,17 +42,17 @@ export const crearRenta = async(req, res, next) => {
 			return res.status(400).json({mensaje:"se requiere los datos para crear un renta"})
 		}
 
-		if (!datos.precio_hora || datos.precio_hora === null) {
+		if (!datos.precio_hora) {
 			console.log("se requiere el precio por hora")
 			return res.status(400).json({mensaje:"se requiere el precio por hora"})
 		}
 
-		if (!datos.tiempo_total || !datos.tiempo_total === null ) {
+		if (!datos.tiempo_total) {
 			console.log("se requiere el tiempo total")
 			return res.status(400).json({mensaje: "se requiere el tiempo total"})
 		}
 
-		if (!datos.sub_total || datos.sub_total === null) {
+		if (!datos.sub_total) {
 			console.log("se requiere el sub total")
 			return res.status(400).json({mensaje:"se requiere el sub total"})
 		}

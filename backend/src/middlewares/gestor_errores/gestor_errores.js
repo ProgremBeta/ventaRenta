@@ -1,4 +1,4 @@
-export const gestorErrores = (err, req, res, next) => {
+export const gestorErrores = (err, req, res) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} → ${err.message}`)
 
   console.log('el error es: ' , err)

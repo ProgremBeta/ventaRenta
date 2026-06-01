@@ -1,6 +1,6 @@
 import * as repository from './clientes.repository.js';
 
-export const obtenerClientes = async (req, res) => {
+export const obtenerClientes = async () => {
     const result = await repository.obtenerClientes();
     return result.rows;
 }

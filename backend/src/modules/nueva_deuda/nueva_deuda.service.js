@@ -22,7 +22,7 @@ export const crearDeuda = async (datos) => {
 
     console.log("resultado de ventas en origen_tipo", venta)
     if (!venta) {
-      throw new Error(`Venta con id ${origenId} no encontrada`);
+      throw new Error(`Venta con id ${datos.origen_id} no encontrada`);
     }
     
     montoTotal = parseFloat(venta[0].total);

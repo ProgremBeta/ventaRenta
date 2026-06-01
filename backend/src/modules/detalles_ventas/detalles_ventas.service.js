@@ -1,6 +1,6 @@
 import * as respository from './detalles_ventas.repository.js';
 
-export const obtenerDetallesVentas = async (req, res) => {
+export const obtenerDetallesVentas = async () => {
     const result = await respository.obtenerDetallesVentas();
     return result.rows;
 };
