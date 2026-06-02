@@ -17,6 +17,8 @@ test('crear venta correctamente', async () => {
         contrasena_hash: "123456"
         })
 
+    console.log("", nuevo_usuario)
+
   const login = await request(app)
   .post('/api/login')
   .send({
@@ -36,6 +38,8 @@ test('crear venta correctamente', async () => {
     descripcion: "esto es una prueba de desarrollo",
   });
 
+  console.log("", nueva_categoria)
+
   const nuevo_producto = await request(app)
   .post('/api/nuevo_producto')
   .set('Authorization', `Bearer ${token}`)
@@ -46,6 +50,8 @@ test('crear venta correctamente', async () => {
     categoria_id: 1,
     stock:5
   });
+
+  console.log("", nuevo_producto)
 
   const nueva_venta = await request(app)
   .post('/api/nueva_venta')
@@ -61,6 +67,9 @@ test('crear venta correctamente', async () => {
       }
     ]
   });
+
+  console.log("", nueva_venta)
+
 
 });
 });

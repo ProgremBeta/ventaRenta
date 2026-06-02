@@ -37,7 +37,7 @@ jobs:
       run: pnpm i
 
     - name: "prueba de eslinter"
-      run: pnpm linter
+      run: pnpm lint
 
     - name: "prueba de test" 
       run: pnpm test
