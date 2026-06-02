@@ -12,7 +12,15 @@ jobs:
     defaults:
       run:
         working-directory: backend
-    
+
+    env:
+      PORT: ${{ secrets.PORT }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+      JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+      JWT_REFRESH_EXPIRES_IN: ${{ secrets.JWT_REFRESH_EXPIRES_IN }}
+
     steps:
     - name: "pruebas de checkout"
       uses: actions/checkout@v4

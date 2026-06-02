@@ -28,7 +28,7 @@ test('crear venta correctamente', async () => {
 
   const token = login._body.token;
   
-  console.log("el token es: ",token)
+  console.log("el token es: ", token)
   
   /* const nueva_categoria = await request(app)
   .post('/api/nueva_categoria')
