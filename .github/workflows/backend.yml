@@ -20,6 +20,17 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 26.2.0
+    
+    - name: "confirmando ubicacion del backend"
+      run: |
+        pwd
+        ls -la
+        find . -name package.json
+
+    - name: "Install pnpm"
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10.33.4
 
     - name: "prueba de instalacion de dependencias"
       run: pnpm i
