@@ -1,0 +1,31 @@
+name: "backend"
+
+on:
+  push:
+    paths: 
+      - 'backend/**'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    
+    steps:
+    - name: "pruebas de checkout"
+      uses: actions/checkout@v4
+    
+    - name: "prueba de version"
+      uses: actions/setup-node@v4
+      with:
+        node-version: 26.2.0
+
+    - name: "prueba de instalacion de dependencias"
+      run: pnpm i
+
+    - name: "prueba de eslinter"
+      run: pnpm linter
+
+    - name: "prueba de test" 
+      run: pnpm test
