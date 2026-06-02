@@ -8,9 +8,6 @@ const BD_URL = process.env.DATABASE_URL;
 
 let pool
 
-console.log("DATABASE_URL existe:", !!process.env.DATABASE_URL);
-console.log("DATABASE_URL longitud:", process.env.DATABASE_URL?.length);
-
 if (!BD_URL || BD_URL.length === 0 ) 
   {     
     console.log("no existe conexion con la base de datos DESPLEGADA")

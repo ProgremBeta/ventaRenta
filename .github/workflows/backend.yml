@@ -39,6 +39,16 @@ jobs:
     - name: "prueba de eslinter"
       run: pnpm lint
 
+    - name: Verificar secrets
+      run: |
+        if [ -z "$DATABASE_URL" ]; then
+          echo "DATABASE_URL VACIA"
+        else
+          echo "DATABASE_URL PRESENTE"
+        fi
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      
     - name: "prueba de test" 
       run: pnpm test
       env:
