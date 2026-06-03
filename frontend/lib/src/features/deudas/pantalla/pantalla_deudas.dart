@@ -189,7 +189,7 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
     );
   }
 
-  InputDecoration _inputDeco(String label) {
+  /*InputDecoration inputDeco(String label) {
     return InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(color: ColorApp.colorTextoMuted),
@@ -208,7 +208,7 @@ class _PantallaDeudasState extends State<PantallaDeudas> {
         borderSide: const BorderSide(color: ColorApp.colorBordeFoco, width: 2),
       ),
     );
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {

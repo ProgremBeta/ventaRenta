@@ -1,5 +1,5 @@
  import 'package:intl/intl.dart';
 
-String FormatoMoneda(num valorDB) {
+String formatoMoneda(num valorDB) {
   return '\$${NumberFormat('#,##0', 'es').format(valorDB)} pesos';
 }

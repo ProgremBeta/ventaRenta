@@ -22,7 +22,7 @@ class Producto {
   });
 
   factory Producto.fromJson(Map<String, dynamic> json) {
-    double _precio(dynamic v) {
+    double precio(dynamic v) {
       if (v == null) return 0.0;
       if (v is num) return v.toDouble();
       if (v is String) return double.tryParse(v) ?? 0.0;
@@ -33,7 +33,7 @@ class Producto {
       id: json['id'] as int,
       nombre: json['nombre'] as String,
       descripcion: json['descripcion'] as String?,
-      precio: _precio(json['precio']),
+      precio: precio(json['precio']),
       categoriaId: json['categoria_id'] as int?,
       activo: json['activo'] as bool?,
       stock: json['stock'] as int?,

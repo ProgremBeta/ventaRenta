@@ -14,7 +14,7 @@ class PagoDeuda {
   });
 
   factory PagoDeuda.fromJson(Map<String, dynamic> json) {
-    double? _parseNum(dynamic v) {
+    double? parseNum(dynamic v) {
       if (v == null) return null;
       if (v is num) return v.toDouble();
       if (v is String) return double.tryParse(v);
@@ -24,7 +24,7 @@ class PagoDeuda {
     return PagoDeuda(
       id: json['id'] as int,
       deudaId: json['deuda_id'] as int?,
-      monto: _parseNum(json['monto']),
+      monto: parseNum(json['monto']),
       metodoPago: json['metodo_pago'] as int?,
       fechaCreacion: json['fecha_creacion'] as String?,
     );

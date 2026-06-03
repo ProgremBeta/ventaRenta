@@ -18,7 +18,7 @@ class DetalleVenta {
   });
 
   factory DetalleVenta.fromJson(Map<String, dynamic> json) {
-    double? _parseNum(dynamic v) {
+    double? parseNum(dynamic v) {
       if (v == null) return null;
       if (v is num) return v.toDouble();
       if (v is String) return double.tryParse(v);
@@ -30,8 +30,8 @@ class DetalleVenta {
       ventaId: json['venta_id'] as int?,
       productoId: json['producto_id'] as int?,
       cantidad: json['cantidad'] as int?,
-      precioUnitario: _parseNum(json['precio_unitario']),
-      subTotal: _parseNum(json['sub_total']),
+      precioUnitario: parseNum(json['precio_unitario']),
+      subTotal: parseNum(json['sub_total']),
       fechaCreacion: json['fecha_creacion'] as String?,
     );
   }

@@ -24,7 +24,7 @@ class Renta {
   });
 
   factory Renta.fromJson(Map<String, dynamic> json) {
-    double? _parseNum(dynamic v) {
+    double? parseNum(dynamic v) {
       if (v == null) return null;
       if (v is num) return v.toDouble();
       if (v is String) return double.tryParse(v);
@@ -38,7 +38,7 @@ class Renta {
       fechaInicio: json['fecha_inicio'] as String?,
       fechaFin: json['fecha_fin'] as String?,
       tiempoTotal: json['tiempo_total']?.toString(),
-      precioTotal: _parseNum(json['precio_total']),
+      precioTotal: parseNum(json['precio_total']),
       metodoPago: json['metodo_pago'] as int?,
       estado: (json['estado'] as String?)?.toLowerCase(),
       fechaCreacion: json['fecha_creacion'] as String?,

@@ -26,7 +26,7 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DeudasProvider()),
       ],
       child: MaterialApp.router(
-        routerConfig: Rutas,
+        routerConfig: rutas,
         builder: (context, child) => GlobalNotificacion.build(child: child ?? const SizedBox.shrink()),
         debugShowCheckedModeBanner: false,
         theme: ThemeData.dark(useMaterial3: true).copyWith(

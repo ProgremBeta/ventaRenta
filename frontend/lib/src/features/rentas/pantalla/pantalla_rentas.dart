@@ -512,13 +512,14 @@ class _FormularioNuevaRentaState extends State<_FormularioNuevaRenta> {
             final exito = await context.read<RentasProvider>().iniciarRenta(data);
 
             if (!mounted) return;
-            Navigator.pop(context);
 
             if (exito) {
               GlobalNotificacion.exito('Renta iniciada con éxito');
             } else {
               GlobalNotificacion.error('Error al iniciar renta');
             }
+            
+            Navigator.pop(context);
           },
           icon: const Icon(Icons.check, color: Colors.white, size: 18),
           label: _enviando

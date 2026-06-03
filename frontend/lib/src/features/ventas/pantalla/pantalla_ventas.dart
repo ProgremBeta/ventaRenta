@@ -69,9 +69,9 @@ class _PantallaVentasState extends State<PantallaVentas> {
                 children: [
                   _detalleRow('Operario', _nombreOperario(p, venta.usuarioId)),
                   _detalleRow('Cliente', _nombreCliente(p, venta.clienteId)),
-                  _detalleRow('Total', FormatoMoneda(valorDB)),
+                  _detalleRow('Total', formatoMoneda(valorDB)),
                   _detalleRow('Método pago', _nombreMetodoPago(p, venta.metodoPago)),
-                  _detalleRow('Fecha', FormatoFecha(fechaDB)),
+                  _detalleRow('Fecha', formatoFecha(fechaDB)),
                   if (venta.estado != null) ...[
                     const SizedBox(height: 4),
                     Row(
@@ -230,7 +230,7 @@ class _PantallaVentasState extends State<PantallaVentas> {
           return ItemLista(
             titulo: 'Venta #${venta.id} — ${_nombreOperario(provider, venta.usuarioId)}',
             subtitulo: '${_nombreCliente(provider, venta.clienteId)}  |  ${_nombreMetodoPago(provider, venta.metodoPago)}',
-            detalle: FormatoMoneda(venta.total),
+            detalle: formatoMoneda(venta.total),
             onTap: () => _mostrarDetalle(venta),
             colorFondo: colorFondo,
             colorBorde: colorBorde,
@@ -291,7 +291,7 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<int>(
-                value: _metodoPago,
+                initialValue: _metodoPago,
                 items: provider.metodoPago.map((p) {
                   return DropdownMenuItem(value: p.id, child: Text(p.nombre, style: const TextStyle(color: ColorApp.colorTexto)));
                 }).toList(),
@@ -302,7 +302,7 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<int>(
-                value: _clienteId,
+                initialValue: _clienteId,
                 items: [
                   const DropdownMenuItem(value: null, child: Text('Ninguno', style: TextStyle(color: ColorApp.colorTextoMuted))),
                   ...provider.clientes.map((c) {
@@ -335,7 +335,7 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
                       Expanded(
                         flex: 3,
                         child: DropdownButtonFormField<int>(
-                          value: d.productoId,
+                          initialValue: d.productoId,
                           items: provider.productos.map((p) {
                             return DropdownMenuItem(value: p.id, child: Text(p.nombre, style: const TextStyle(color: ColorApp.colorTexto)));
                           }).toList(),
@@ -443,7 +443,7 @@ class _FormularioNuevaVentaState extends State<_FormularioNuevaVenta> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Venta #${venta.id} — ${FormatoMoneda(venta.total)}',
+            'Venta #${venta.id} — ${formatoMoneda(venta.total)}',
             style: const TextStyle(color: ColorApp.colorTexto, fontSize: 16),
           ),
           const SizedBox(height: 16),

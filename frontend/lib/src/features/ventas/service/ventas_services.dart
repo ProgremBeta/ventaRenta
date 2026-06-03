@@ -63,7 +63,7 @@ class VentaServices {
       final List<dynamic> data = response.data;
       return data.map((json) => Cliente.fromJson(json)).toList();
     } catch (e) {
-      debugPrint("❌ [VentaServices] GET /api/clientes → $e");
+      debugPrint("❌ [VentaServices] GET /api/clientes → ${e}");
       return [];
     }
   }

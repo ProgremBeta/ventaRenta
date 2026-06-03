@@ -18,7 +18,7 @@ class Venta {
   });
 
   factory Venta.fromJson(Map<String, dynamic> json) {
-    double _total(dynamic v) {
+    double total(dynamic v) {
       if (v == null) return 0.0;
       if (v is num) return v.toDouble();
       if (v is String) return double.tryParse(v) ?? 0.0;
@@ -29,7 +29,7 @@ class Venta {
       id: json['id'] as int,
       usuarioId: json['usuario_id'] as int?,
       clienteId: json['cliente_id'] as int?,
-      total: _total(json['total']),
+      total: total(json['total']),
       metodoPago: json['metodo_pago'] as int?,
       estado: json['estado'] as String?,
       fechaCreacion: json['fecha_creacion'] as String?,

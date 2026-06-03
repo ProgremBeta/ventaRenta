@@ -10,7 +10,7 @@ import 'package:frontend/src/features/inventario/pantalla/pantalla_inventario.da
 
 import 'package:frontend/src/app/navegacion_barra.dart';
 
-GoRouter Rutas = GoRouter(
+GoRouter rutas = GoRouter(
   initialLocation: '/login',
   routes: [
     GoRoute(path: '/login', builder: (context, state) => const PantallaLogin()),

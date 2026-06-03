@@ -210,7 +210,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                 if (esAdmin) ...[
                   const SizedBox(height: 12),
                   DropdownButtonFormField<int>(
-                    value: rolSeleccionado,
+                    initialValue: rolSeleccionado,
                     items: const [
                       DropdownMenuItem(value: 1, child: Text('Admin', style: TextStyle(color: ColorApp.colorTexto))),
                       DropdownMenuItem(value: 2, child: Text('Usuario', style: TextStyle(color: ColorApp.colorTexto))),
@@ -371,7 +371,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                         child: ListView(
                           shrinkWrap: true,
                           children: filtrados.map((u) {
-                            final id = u['id'] as int? ?? 0;
                             final nombre = u['nombre'] as String? ?? '';
                             final identificacion = u['identificacion'] as String? ?? '—';
                             return ListTile(
@@ -458,7 +457,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                 if (esAdmin) ...[
                   const SizedBox(height: 12),
                   DropdownButtonFormField<int>(
-                    value: rolSeleccionado,
+                    initialValue: rolSeleccionado,
                     items: const [
                       DropdownMenuItem(value: 1, child: Text('Admin', style: TextStyle(color: ColorApp.colorTexto))),
                       DropdownMenuItem(value: 2, child: Text('Usuario', style: TextStyle(color: ColorApp.colorTexto))),
@@ -665,7 +664,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField<int>(
-                  value: metodoSeleccionado,
+                  initialValue: metodoSeleccionado,
                   items: metodos.map((m) {
                     return DropdownMenuItem(value: m.id, child: Text(m.nombre, style: const TextStyle(color: ColorApp.colorTexto)));
                   }).toList(),
@@ -871,7 +870,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField<int>(
-                  value: rolSeleccionado,
+                  initialValue: rolSeleccionado,
                   items: roles.map((r) {
                     final nombre = r['nombre'] as String? ?? r['name'] as String? ?? 'Rol #${r['id']}';
                     final id = r['id'] as int? ?? 0;

@@ -23,10 +23,8 @@ class CategoriasService {
   }
 
   Future<bool> crearCategoriaProducto(Map<String, dynamic> data) async {
-    debugPrint("datos recibidos ${data}");
     try {
       final response = await _dio.post('/api/categorias_productos', data: data);
-      debugPrint("respuesta de la peticion: ${response}");
       debugPrint("📡 [CategoriasService] POST /api/categorias_productos → ${response.statusCode}");
       debugPrint("📦 ${response.data}");
       return true;
