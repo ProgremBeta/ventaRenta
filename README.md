@@ -1,130 +1,219 @@
 # Proyecto Venta Renta
 
+![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white)
+![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?logo=dart&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions&logoColor=white)
+![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=black)
+
+## Tabla de Contenido
+
+- Caracteristicas
+- Arquitectura
+- Tecnologias
+- Instalacion
+- Variables de entorno
+- Base de datos
+- Api
+- CI/CD
+
 ## Introduccion
 
-Este es un repositorio monolitico(tiene backend y frontend juntos) usando una estructura de carpetas modular y por capas.
+Este es un repositorio monolitico(tiene backend y frontend juntos) usando una estructura de carpetas modular.
 
-## Instalar proyecto completo 
+login
 
-hacer un git clone del proyecto:
+![Texto descriptivo](./imgs/login.png)
 
-    git clone https://github.com/ProgremBeta/ventaRenta
-    cd ventaRenta
+inicio
 
-seguir las siguientes instrucciones:
+![Texto descriptivo](./imgs/inicio.png)
 
-### BACKEND
+inventario
+
+![Texto descriptivo](./imgs/inventario.png)
+
+## Instalar proyecto 
+
+hacer un git clone del proyecto y movernos hacia la carpeta:
+
+```bash
+git clone https://github.com/ProgremBeta/ventaRenta
+cd ventaRenta
+```
+
+### -------------------------------------------------- levantar el backend --------------------------------------------------
 
 Estando en la raiz del proyecto navegar hasta el backend:
 
-    ce backend
+```bash
+cd backend
+```
 
-En necesario que tenga instalado Node JS https://nodejs.org/en y NPM, en windows al instalar desde la pagina oficial viene incluido el npm con el node js, para verificar la instalacion ejecutar el siguiente comando:
+En necesario que tenga instalado Node JS https://nodejs.org/en y "pnpm", en windows al instalar desde la pagina oficial viene incluido el npm con el node js. o podemos ejecutar los siguientes comandos para instalar pnpm.
 
-``` bash
-  node -v
-  npm -v
+#### En Windows (PowerShell)
+
+```bash
+iwr https://pnpm.io -useb | iex
+```
+
+#### En macOS (Terminal)
+
+```bash
+brew install pnpm
+```
+
+o
+
+```bash
+curl -fsSL https://pnpm.io | sh -
+```
+
+#### En Linux (Terminal)
+
+```bash
+curl -fsSL https://pnpm.io | sh -
+```
+
+para verificar la instalacion ejecutar el siguiente comando:
+
+```bash
+node -v
+pnpm -v
 ```
 
 En algunas distribuciones de linux se tiene que instalar el npm aparte, tendrian que buscarlo en su gestor de paquete he instalarlo, en mi caso uso arch entonces los comandos serian:
 
-    sudo pacman -S nodejs
-    sudo pacman -S npm
+```bash
+sudo pacman -S nodejs
+sudo pacman -S pnpm
+```
 
-y vuelve a verificar la instalacion.
-
-### Paquetes usados en el backend
-
-  * bcrypt
-  * cors
-  * dotenv
-  * express
-  * jsonwebtoken
-  * pg
-
-### Comando de instalacion
-
-para instalar estos paquetes simplemente se usa el comando:
-
-    npm install
-
-### ejecucion del proyectos
-
-El proyecto actualmente esta en desarrollo y para ejecutarlo con autorefresco:
-
-    npm run dev
-
->[!NOTE]
-> para que no tenga ningun inconventiente tiene que estar ubicado en la raiz del proyecto backend
-
-### FRONTEND
+### -------------------------------------------------- levantar el frontend --------------------------------------------------
 
 Estando en la raiz del proyecto navegar hasta el frontend:
 
-    cd frontend
+```bash
+cd frontend
+```
 
-el frontend esta siendo desarrollado en flutter entonces para ejecutar el proyectos en necesario lo siguiente:
+el bashfrontend esta desarrollado en flutter entonces necesitaremos tenerlo instalado y configurado.
 
->[!NOTE]
+> [bash!NOTE]
+>
 > Depende del sistema operativo al instalar el flutter todo viene integrado y otros es necesario instarlar estos paquetes manualmente.
 
-  * instalar flutter https://docs.flutter.dev/install 
-  * instalar cmake https://cmake.org/download/
-  * instalar ninja https://pub.dev/packages/ninja/versions
-
-### Ejecutar frontend
+* instalar flutter https://docs.flutter.dev/install 
+* instalar cmake https://cmake.org/download/
+* instalar ninja https://pub.dev/packages/ninja/versions
 
 ya teniendo todos los paquetes de flutter tambien se puden comprobar que este correcto con el comando:
 
-    flutter doctor
-  
-y para ejecutar el proyecto el comando:
+```bash
+flutter doctor
+```
 
-  flutter run
+flutter me permite desarrollar para multiplataforma entonces puedo ejecutarlo en android, ios, windows, macOS, linux, web y embebidos
 
-### base de datos
+el resultado sera algo similar a esto, en mi caso, linux y android
+bash
+![Texto descriptivo](./imgs/doctor.png)
 
-La base de datos que use fue POSTGRESQL y esta ubicada en database, desde la raiz del proyecto ingresar el comando:
-
-    cd backend/src/database
-
-ahi estan las diferentes versiones de la base de datos
-
-  * schema_V1.sql
-  * schema_V2.sql
+para usar android tienen que instalar android studio y intalar "cmd-tools"
 
 
+### -------------------------------------------------- base de datos --------------------------------------------------
+> [bash!NOTE]
+>
+> primero es necesario hacer la instacion de los paquetes o tener prisma. Esta en el apartado de configuracion y ejecucion
 
+La base de datos que use fue POSTGRESQL con prisma, para este caso sugiero usar el comando para dev, hay 2 diferiencias entre el dev y el de deploy.
 
+1. dev: crea la estructura y ejecuta datos que el desarollador quiera que vean(en mi caso solo la estructura)
 
+```bash
+pnpm prisma migrate dev
+```
 
+2. deploy: esta se usa si NO queremos afectar datos existentes, entonces al levantar el proyecto no deberia existir datos.
 
+```bash
+pnpm prisma migrate dev
+```
 
+### .env
 
+para el correcto funcionamiento del proyecto es necesario ingresar correctamente las variables de entorno.
 
-### Notas de desarrollo
+aqui se vera un ejemplo de los datos requerido para las variables de entorno.
 
->[!WARNING]
-> Estas notas de desarrollo estan para tener encuenta los cosas que me falta implementar o cosas que me resultaron utiles en el desarrollo, dicho esto, este apartado se eliminara o va ir cambiendo deacuerdo al desarrollo o al finalizarlo el mismo.
+```bash
+cd backend/.env.ejemplo
+```
 
-  * la mayoria de request necesitan condicionales pues muestran errores generales y quiero que el usuario sepa en que esta equivocado y corregir la falla o saber si fue un problema de entrada de datos o del sistema.
+## configuracion y ejecucion
 
-  * al intentar crear algunos valores a la base de datos no deja, por que se declaro cuando se creo la base de datos como valores en las tablas que dependen de otros valores de otras tablas o que estan limitados hasta cierta cantidad de caracteres. Entonces voy a cambiar en algunos valores de algunas tablas el limite de caracteres permitidos.
+estamos en la etapa final para levantar el proyecto completamente.
 
-  * entonces hay que tener en cuenta que cuando sale un valor null o salga con errores de "tipo de datos incorrectos" mayormente se debe a la cantidad de caracteres permitidos
+### backend
 
-  * en el backend hay un archivo PruebasREST.http que la uso con la extension en visual studio code https://marketplace.visualstudio.com/items?itemName=humao.rest-client para hacer las pruebas rapidas.
+iniciemos por el backend, instalando los paquetes.
 
-  * la estructura de la base de datos hace falta actualizar algunos casos para se adecuen al proposito del programa, tener mas control y mejorar los registros.
+```bash
+pnpm i
+```
 
-  * en shared esta el archivo de transicion que es para evitar errores al hacer las peticiones, en si entra en un estado de transicion que inicia con BEGIN, si no hay errores hace el COMMIT y si hay algun fallo hacer un ROCKBALL que revierte los cambios hechos durante ese estado. Esto no esta completamente implementado ya que con las condicionales no han habido mayores problemas pero de igual forma lo quiero implementar para tener mas seguridad y no tener fallos.
+con los paquetes instalados podemos ejecutar el proyecto.
 
-  * uufff el abrir el visual con los 2 repositorios el del backend y frontend que es un repo monolib parece que se va estallar mi pc
+```bash
+pnpm start
+```
 
-  * unos de los cambios drastricos en la base de datos va ser en rentas, renta_dispositivos, dispositivos ya que no tiene un flujo correcto y me equivoque al asignarlos para que tenga un coerenci entre el nombre y su proposito. De momento tengo pensado en hacer cambios a :
-    * renta
-    * renta_dispositivos
+## configuracion y ejecucion
+### frontend
 
-  * la tabla de usuarios necesita una columna que sea de ID o cambiarlo para que al ingresar el usuario el identificador sea un numero que vaya aumentando, si no, con el numero de identificacion para que funcione el login, de momento voy hacer el login con el numero de identificacion para cuando realize la restructuracion de la base de datos no cambie la logica.
+bien estamos en la etapa final para levantar el proyecto.
 
-  * estaba tratando de manejar esta estructura de carpetas de una forma que pense que estaba correcto pero me di cuenta de que no la supe manejar o no la entendi, entonces voy hacer otro gran cambio ya que lo que estaba haciendo ya me parecia enredando, los archivos que estaba haciendo y la gran parte de los endpoints no los voy a usar, entonces estoy optando por dejar solo lo que se necesita y se va a usar.
+### backend
+iniciemos por el backend, instalando los paquetes.
+
+```bash
+pnpm i
+```
+
+con los paquetes instalados podemos ejecutar el proyecto.
+
+```bash
+pnpm start
+```
+
+### frontend
+
+para instalar las dependencias usamos:
+
+```bash
+flutter pub get
+```
+
+tambien podemos verificar el dispositivo usando
+
+```bash
+flutter devices
+```
+y finalmente ejecutarlo
+
+```bash
+flutter run
+```
+
+## Estado
+
+🚧 En desarrollo activo
+
+## Autor
+
+Juan Ignacio Betancur (progremb)
