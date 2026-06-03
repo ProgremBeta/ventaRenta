@@ -9,17 +9,6 @@
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions&logoColor=white)
 ![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=black)
 
-## Tabla de Contenido
-
-- Caracteristicas
-- Arquitectura
-- Tecnologias
-- Instalacion
-- Variables de entorno
-- Base de datos
-- Api
-- CI/CD
-
 ## Introduccion
 
 Este es un repositorio monolitico(tiene backend y frontend juntos) usando una estructura de carpetas modular.
